@@ -2,6 +2,9 @@
 assert = require 'assert'
 $ = require '../src'
 
+y = (d, q) -> assert.equal true, $.ev d, q
+n = (d, q) -> assert.equal false, $.ev d, q
+
 describe 'ev', ->
 
   describe 'logical ops', ->
@@ -9,73 +12,73 @@ describe 'ev', ->
     describe '$and', ->
 
       it 'should match two positives', ->
-        assert.equal true, $.ev { foo: bar: '123' }, { $and: [ { 'foo': $exists: true }, { 'foo.bar': { $eq: '123' } } ] }
+        y { foo: bar: '123' }, { $and: [ { 'foo': $exists: true }, { 'foo.bar': { $eq: '123' } } ] }
 
       it 'should not match one positive and one negative', ->
-        assert.equal false, $.ev { foo: bar: '123' }, { $and: [ { 'foo': $exists: true }, { 'foo.bar': { $eq: '1234' } } ] }
+        n { foo: bar: '123' }, { $and: [ { 'foo': $exists: true }, { 'foo.bar': { $eq: '1234' } } ] }
 
       it 'should match nested positive', ->
-        assert.equal true, $.ev { foo: 1, bar: 2}, { $and: [ $and: [ { 'foo': { $eq: 1 } } ] ] }
+        y { foo: 1, bar: 2}, { $and: [ $and: [ { 'foo': { $eq: 1 } } ] ] }
 
     describe '$or', ->
 
       it 'should match one positive', ->
-        assert.equal true, $.ev { foo: 1 }, { $or: [ { 'foo': $gt: 0 } ] }
+        y { foo: 1 }, { $or: [ { 'foo': $gt: 0 } ] }
 
       it 'should match one positive and one negative', ->
-        assert.equal true, $.ev { foo: 1 }, { $or: [ { 'foo': $gt: 0 }, { 'foo': $lt: -1 } ] }
+        y { foo: 1 }, { $or: [ { 'foo': $gt: 0 }, { 'foo': $lt: -1 } ] }
 
       it 'should not match two negatives', ->
-        assert.equal false, $.ev { foo: 1 }, { $or: [ { 'foo': $gt: 2 }, { 'foo': $lt: 0 } ] }
+        n { foo: 1 }, { $or: [ { 'foo': $gt: 2 }, { 'foo': $lt: 0 } ] }
 
       it 'should not match single negatives', ->
-        assert.equal false, $.ev { foo: 1 }, { $or: [ { 'foo2': $eq: 1 } ] }
+        n { foo: 1 }, { $or: [ { 'foo2': $eq: 1 } ] }
 
     describe '$nor', ->
 
       it 'should not match single positive', ->
-        assert.equal false, $.ev { foo: 1 }, { $nor: [ { 'foo': $eq: 1 } ] }
+        n { foo: 1 }, { $nor: [ { 'foo': $eq: 1 } ] }
 
       it 'should match single negative', ->
-        assert.equal true, $.ev { foo: 1 }, { $nor: [ { 'foo': $eq: 2 } ] }
+        y { foo: 1 }, { $nor: [ { 'foo': $eq: 2 } ] }
 
       it 'should match two negatives', ->
-        assert.equal true, $.ev { foo: 1 }, { $nor: [ { 'foo': $eq: 2 }, { 'bar': $eq: 1 } ] }
+        y { foo: 1 }, { $nor: [ { 'foo': $eq: 2 }, { 'bar': $eq: 1 } ] }
 
       it 'should not match one positive and one negative', ->
-        assert.equal false, $.ev { foo: 1 }, { $nor: [ { 'foo': $eq: 2 }, { 'foo': $eq: 1 } ] }
+        n { foo: 1 }, { $nor: [ { 'foo': $eq: 2 }, { 'foo': $eq: 1 } ] }
 
     describe '$not', ->
 
       it 'should not match negated positive equality', ->
-        assert.equal false, $.ev { foo: 1 }, { 'foo': $not: $eq: 1 }
+        n { foo: 1 }, { 'foo': $not: $eq: 1 }
 
       it 'should match negated negative equality', ->
-        assert.equal true, $.ev { foo: 1 }, { 'foo': $not: $eq: 2 }
+        y { foo: 1 }, { 'foo': $not: $eq: 2 }
 
   it 'should work with nothing', ->
-    assert.equal true, $.ev()
+    y null, null
 
   it 'should match eq', ->
-    assert.equal true, $.ev { foo: 1 }, { 'foo': { $eq: 1 } }
+    y { foo: 1 }, { 'foo': { $eq: 1 } }
 
   it 'should not match eq', ->
-    assert.equal false, $.ev { foo: 1 }, { 'foo': { $eq: 2 } }
+    n { foo: 1 }, { 'foo': { $eq: 2 } }
 
   it 'should not match non existing eq', ->
-    assert.equal false, $.ev { foo: 1 }, { 'foo2': { $eq: 1 } }
+    n { foo: 1 }, { 'foo2': { $eq: 1 } }
 
   it 'should work with simple $and', ->
-    assert.equal true, $.ev { foo: bar: 1 }, { $and: [ { 'foo.bar': { $eq: 1 } }, { 'foo': $exists: true } ] }
+    y { foo: bar: 1 }, { $and: [ { 'foo.bar': { $eq: 1 } }, { 'foo': $exists: true } ] }
 
   it 'should work with simple $exists false', ->
-    assert.equal false, $.ev { foo: bar: 1 }, { 'foo.bar': $exists: false }
+    n { foo: bar: 1 }, { 'foo.bar': $exists: false }
 
   it 'should work with simple $exists false 2', ->
-    assert.equal false, $.ev { foo: bar: 1 }, { 'foo.baz': $exists: true }
+    n { foo: bar: 1 }, { 'foo.baz': $exists: true }
 
   it 'should work with simple $exists false', ->
-    assert.equal true, $.ev { foo: bar: 1 }, { 'foo.bar': $exists: true }
+    y { foo: bar: 1 }, { 'foo.bar': $exists: true }
 
   it 'should not match lt', ->
-    assert.equal false, $.ev { foo: bar: 123 }, { 'foo.bar': { $lt: 100 } }
+    n { foo: bar: 123 }, { 'foo.bar': { $lt: 100 } }
