@@ -135,6 +135,34 @@ describe 'ev', ->
       it 'should match negative existance', ->
         y { foo: bar: 1 }, { 'foo.baz': $exists: false }
 
+      it 'should match number type', ->
+        y { foo: bar: 1.2 }, { 'foo.bar': $type: 'number' }
+
+      it 'should match boolean type', ->
+        y { foo: bar: true }, { 'foo.bar': $type: 'boolean' }
+
+      it 'should match string type', ->
+        y { foo: bar: 'foo' }, { 'foo.bar': $type: 'string' }
+
+      it 'should match object type', ->
+        y { foo: bar: /foo/ }, { 'foo.bar': $type: 'object' }
+        y { foo: bar: new Date() }, { 'foo.bar': $type: 'object' }
+
+    describe 'evaluation ops', ->
+
+      it 'should match modulo', ->
+        y { foo: bar: 5 }, { 'foo.bar': $mod: [ 5, 0 ] }
+        y { foo: bar: 5 }, { 'foo.bar': $mod: [ 3, 2 ] }
+        y { foo: bar: 5 }, { 'foo.bar': $mod: [ 2, 1 ] }
+
+      it 'should not match modulo', ->
+        n { foo: bar: 5 }, { 'foo.bar': $mod: [ 5, 1 ] }
+        n { foo: bar: 5 }, { 'foo.bar': $mod: [ 3, 3 ] }
+        n { foo: bar: 5 }, { 'foo.bar': $mod: [ 2, 0 ] }
+
+
+
+
   it 'should not match eq', ->
     n { foo: 1 }, { foo: { $eq: 2 } }
 

@@ -24,10 +24,10 @@ ev = (d, q) ->
 
       # Element query ops
       when '$exists' then not (v ^ d?)
-      when '$type' then d typeof v # TODO: do it right
+      when '$type' then typeof d is v # TODO: do it right
 
       # Evaluation query ops
-      when '$mod' then d % v[0] is v[1]
+      when '$mod' then (d % v[0]) is v[1]
       when '$regex' then v.match(new RegExp(v, q.$options))?
       when '$options' then true # HACK
 
