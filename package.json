@@ -1,0 +1,40 @@
+{
+  "name": "json-criteria",
+  "version": "0.0.1",
+  "description": "Evaluate criteria queries on JSON objects MongoDB style.",
+  "main": "lib/index.js",
+  "scripts": {
+    "test": "mocha --compilers coffee:coffee-script/register spec/**/*"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mirek/node-json-criteria.git"
+  },
+  "bugs": {
+    "url": "https://github.com/mirek/node-json-criteria/issues"
+  },
+  "homepage": "https://github.com/mirek/node-json-criteria",
+  "keywords": [
+    "mongo",
+    "like",
+    "query",
+    "criteria",
+    "json",
+    "evaluate",
+    "find"
+  ],
+  "author": "Mirek Rusin http://github.com/mirek",
+  "license": "MIT",
+  "dependencies": {
+    "rus-diff": "0.0.8"
+  },
+  "devDependencies": {
+    "coffee-script": "^1.8.0",
+    "grunt": "^0.4.5",
+    "grunt-cli": "^0.1.13",
+    "grunt-contrib-clean": "^0.6.0",
+    "grunt-contrib-coffee": "^0.12.0",
+    "grunt-mocha-test": "^0.12.1",
+    "mocha": "^1.21.4"
+  }
+}
