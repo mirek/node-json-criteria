@@ -123,6 +123,9 @@ describe 'ev', ->
         it 'should match in', ->
           y { foo: 1 }, { foo: $in: [ 1 ] }
 
+        it 'should match in array', ->
+          y { foo: [ 1, 2, 3 ] }, { foo: $in: [ 2 ] }
+
         it 'should match in with more options', ->
           y { foo: 1 }, { foo: $in: [ 2, 3, 1, 4 ] }
 

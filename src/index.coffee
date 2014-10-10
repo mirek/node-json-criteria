@@ -1,6 +1,8 @@
 
 { resolve } = require 'rus-diff'
 
+arrize = (a) -> if Array.isArray(a) then a else [ a ]
+
 ev = (d, q) ->
   r = true
   for k, v of q
@@ -19,8 +21,8 @@ ev = (d, q) ->
       when '$lte' then d <= v
       when '$gt' then d > v
       when '$gte' then d >= v
-      when '$in' then d in v
-      when '$nin' then d not in v
+      when '$in' then da = arrize(d); v.some (e) -> e in da
+      when '$nin' then da = arrize(d); v.every (e) -> e not in da
 
       # Element query ops
       when '$exists' then not (v ^ d?)
@@ -36,16 +38,9 @@ ev = (d, q) ->
       # TODO: Geospatial ops
 
       # Array query ops
-      when '$all' then throw new Error 'Not implemented'
-
-      when '$elemMatch'
-        er = false
-        if Array.isArray d
-          for e in d
-            if ev e, v
-              er = true
-              break
-        er
+      when '$all' then da = arrize(d); v.every (e) -> e in da
+      when '$elemMatch' then Array.isArray(d) and d.some (e) -> ev(e, v)
+      when '$size' then v is (if Array.isArray(d) then d.length else 0)
 
       else
         [ dvp, dk ] = resolve d, k
