@@ -193,6 +193,32 @@ describe 'ev', ->
         it 'should match case insensitive', ->
           y { foo: bar: 'BAZ' }, { 'foo.bar': { $regex: '^baz$', $options: 'i' } }
 
+      # describe '$text', ->
+      #
+      #   it 'should not work', ->
+      #     n { foo: 'bar' }, { $text: 'bar' }
+
+      describe '$where', ->
+
+        it 'should match', ->
+          y { foo: bar: 'x' }, { 'foo.bar': $where: (v) -> v is 'x'  }
+
+        it 'should not match', ->
+          n { foo: bar: 'x' }, { 'foo.bar': $where: (v) -> v isnt 'x'  }
+
+    describe 'array query ops', ->
+
+      describe '$elemMatch', ->
+
+        it 'should match', ->
+          y { foo: bar: [ 1, 3, 5 ] }, { 'foo.bar': $elemMatch: { $eq: 3 } }
+
+        it 'should not match', ->
+          n { foo: bar: [ 1, 3, 5 ] }, { 'foo.bar': $elemMatch: { $eq: 4 } }
+
+        it 'should match with $where', ->
+          y { foo: bar: [ 1, 3, 5 ] }, { 'foo.bar': $elemMatch: { $where: (v) -> v is 5 } }
+
   it 'should not match eq', ->
     n { foo: 1 }, { foo: { $eq: 2 } }
 

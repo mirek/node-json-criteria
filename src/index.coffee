@@ -30,12 +30,22 @@ ev = (d, q) ->
       when '$mod' then (d % v[0]) is v[1]
       when '$regex' then d.match(new RegExp(v, q.$options))?
       when '$options' then true # HACK
-
       when '$text' then false
       when '$where' then v d # TODO: security
 
       # TODO: Geospatial ops
-      # TODO: Array query ops
+
+      # Array query ops
+      when '$all' then throw new Error 'Not implemented'
+
+      when '$elemMatch'
+        er = false
+        if Array.isArray d
+          for e in d
+            if ev e, v
+              er = true
+              break
+        er
 
       else
         [ dvp, dk ] = resolve d, k
