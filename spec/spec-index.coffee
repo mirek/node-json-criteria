@@ -59,7 +59,7 @@ describe 'ev', ->
       it 'should match negated negative equality', ->
         y { foo: 1 }, { foo: $not: $eq: 2 }
 
-    describe 'comparision ops', ->
+    describe 'comparison ops', ->
 
       it 'should match equality', ->
         y { foo: 1 }, { foo: $eq: 1 }

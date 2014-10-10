@@ -12,7 +12,7 @@ ev = (d, q) ->
       when '$nor' then v.reduce ((p, c) -> p and not ev(d, c)), true
       when '$not' then not ev(d, v)
 
-      # Comparision ops
+      # Comparison ops
       when '$eq' then d is v
       when '$ne' then d isnt v
       when '$lt' then d < v
