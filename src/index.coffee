@@ -4,15 +4,12 @@
 ev = (d, q) ->
   r = true
   for k, v of q
-
-    # console.log JSON.stringify { k, v, q }
-
-    r = r and switch k
+    s = switch k
 
       # Logical ops
-      when '$and' then v.reduce ((p, c) -> ev(d, p) and ev(d, c)), true
-      when '$or' then v.reduce ((p, c) -> ev(d, p) or ev(d, c)), false
-      when '$nor' then v.reduce ((p, c) -> ev(d, p) and not ev(d, c)), true
+      when '$and' then v.reduce ((p, c) -> p and ev(d, c)), true
+      when '$or' then v.reduce ((p, c) -> p or ev(d, c)), false
+      when '$nor' then v.reduce ((p, c) -> p and not ev(d, c)), true
       when '$not' then not ev(d, v)
 
       # Comparision ops
@@ -46,6 +43,10 @@ ev = (d, q) ->
           ev dvp[dk[0]], v
         else
           ev null, v # we can match $exists false.
+
+    # console.log JSON.stringify { k, v, q, r, s }
+
+    r = r and s
 
     break unless r
   r
