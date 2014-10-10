@@ -3,7 +3,7 @@
 
 ## Installation
 
-  npm install json-criteria --save
+    npm install json-criteria --save
 
 ## Usage
 
