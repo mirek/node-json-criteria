@@ -10,8 +10,8 @@
 Currently we're exposing single function `ev(doc, query)` which returns true on match and false otherwise.
 
     var ev = require('json-criteria').ev
-    console.log(ev({ foo: bar: 123 }, { 'foo.bar': { $eq: 123 } })) # true
-    console.log(ev({ foo: bar: 123 }, { 'foo.bar': { $lt: 100 } })) # false
+    console.log(ev({ foo: bar: 123 }, { 'foo.bar': { $eq: 123 } })) // true
+    console.log(ev({ foo: bar: 123 }, { 'foo.bar': { $lt: 100 } })) // false
 
 For more examples have a look at specs.
 
