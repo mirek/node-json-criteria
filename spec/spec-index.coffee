@@ -9,27 +9,30 @@ describe 'ev', ->
 
   describe 'logical ops', ->
 
+    it 'should match nothing', ->
+      y null, null
+
     describe '$and', ->
 
       it 'should match two positives', ->
-        y { foo: bar: '123' }, { $and: [ { 'foo': $exists: true }, { 'foo.bar': { $eq: '123' } } ] }
+        y { foo: bar: '123' }, { $and: [ { foo: $exists: true }, { 'foo.bar': { $eq: '123' } } ] }
 
       it 'should not match one positive and one negative', ->
-        n { foo: bar: '123' }, { $and: [ { 'foo': $exists: true }, { 'foo.bar': { $eq: '1234' } } ] }
+        n { foo: bar: '123' }, { $and: [ { foo: $exists: true }, { 'foo.bar': { $eq: '1234' } } ] }
 
       it 'should match nested positive', ->
-        y { foo: 1, bar: 2}, { $and: [ $and: [ { 'foo': { $eq: 1 } } ] ] }
+        y { foo: 1, bar: 2}, { $and: [ $and: [ { foo: { $eq: 1 } } ] ] }
 
     describe '$or', ->
 
       it 'should match one positive', ->
-        y { foo: 1 }, { $or: [ { 'foo': $gt: 0 } ] }
+        y { foo: 1 }, { $or: [ { foo: $gt: 0 } ] }
 
       it 'should match one positive and one negative', ->
-        y { foo: 1 }, { $or: [ { 'foo': $gt: 0 }, { 'foo': $lt: -1 } ] }
+        y { foo: 1 }, { $or: [ { foo: $gt: 0 }, { foo: $lt: -1 } ] }
 
       it 'should not match two negatives', ->
-        n { foo: 1 }, { $or: [ { 'foo': $gt: 2 }, { 'foo': $lt: 0 } ] }
+        n { foo: 1 }, { $or: [ { foo: $gt: 2 }, { foo: $lt: 0 } ] }
 
       it 'should not match single negatives', ->
         n { foo: 1 }, { $or: [ { 'foo2': $eq: 1 } ] }
@@ -37,39 +40,95 @@ describe 'ev', ->
     describe '$nor', ->
 
       it 'should not match single positive', ->
-        n { foo: 1 }, { $nor: [ { 'foo': $eq: 1 } ] }
+        n { foo: 1 }, { $nor: [ { foo: $eq: 1 } ] }
 
       it 'should match single negative', ->
-        y { foo: 1 }, { $nor: [ { 'foo': $eq: 2 } ] }
+        y { foo: 1 }, { $nor: [ { foo: $eq: 2 } ] }
 
       it 'should match two negatives', ->
-        y { foo: 1 }, { $nor: [ { 'foo': $eq: 2 }, { 'bar': $eq: 1 } ] }
+        y { foo: 1 }, { $nor: [ { foo: $eq: 2 }, { 'bar': $eq: 1 } ] }
 
       it 'should not match one positive and one negative', ->
-        n { foo: 1 }, { $nor: [ { 'foo': $eq: 2 }, { 'foo': $eq: 1 } ] }
+        n { foo: 1 }, { $nor: [ { foo: $eq: 2 }, { foo: $eq: 1 } ] }
 
     describe '$not', ->
 
       it 'should not match negated positive equality', ->
-        n { foo: 1 }, { 'foo': $not: $eq: 1 }
+        n { foo: 1 }, { foo: $not: $eq: 1 }
 
       it 'should match negated negative equality', ->
-        y { foo: 1 }, { 'foo': $not: $eq: 2 }
+        y { foo: 1 }, { foo: $not: $eq: 2 }
 
-  it 'should work with nothing', ->
-    y null, null
+    describe 'comparision ops', ->
 
-  it 'should match eq', ->
-    y { foo: 1 }, { 'foo': { $eq: 1 } }
+      it 'should match equality', ->
+        y { foo: 1 }, { foo: $eq: 1 }
+
+      it 'should not match equality', ->
+        n { foo: 1 }, { foo: $eq: 2 }
+
+      it 'should not match non existing', ->
+        n { foo: 1 }, { bar: $eq: 2 }
+
+      it 'should match non equality', ->
+        y { foo: 1 }, { foo: $ne: 2 }
+
+      it 'should not match non equality', ->
+        n { foo: 1 }, { foo: $ne: 1 }
+
+      it 'should match lower than', ->
+        y { foo: 1 }, { foo: $lt: 2 }
+
+      it 'should not match lower than', ->
+        n { foo: 1 }, { foo: $lt: 1 }
+
+      it 'should match lower than or equal', ->
+        y { foo: 1 }, { foo: $lte: 1 }
+
+      it 'should match lower than or equal 2', ->
+        y { foo: 1 }, { foo: $lte: 2 }
+
+      it 'should not match lower than or qual', ->
+        n { foo: 1 }, { foo: $lte: 0 }
+
+      it 'should match greater than', ->
+        y { foo: 1 }, { foo: $gt: 0 }
+
+      it 'should not match greater than', ->
+        n { foo: 1 }, { foo: $gt: 1 }
+
+      it 'should match greater than or equal', ->
+        y { foo: 1 }, { foo: $gte: 1 }
+
+      it 'should match greater than or equal 2', ->
+        y { foo: 1 }, { foo: $gte: 0 }
+
+      it 'should not match greater than or qual', ->
+        n { foo: 1 }, { foo: $gte: 2 }
+
+      it 'should match in', ->
+        y { foo: 1 }, { foo: $in: [ 1 ] }
+
+      it 'should match in with more options', ->
+        y { foo: 1 }, { foo: $in: [ 2, 3, 1, 4 ] }
+
+      it 'should not match in', ->
+        n { foo: 1 }, { foo: $in: [ 2, 3, 4 ] }
+
+      it 'should match not in', ->
+        y { foo: 1 }, { foo: $nin: [ 2, 3, 4 ] }
+
+      it 'should not match not in', ->
+        n { foo: 1 }, { foo: $nin: [ 1, 2 ] }
 
   it 'should not match eq', ->
-    n { foo: 1 }, { 'foo': { $eq: 2 } }
+    n { foo: 1 }, { foo: { $eq: 2 } }
 
   it 'should not match non existing eq', ->
     n { foo: 1 }, { 'foo2': { $eq: 1 } }
 
   it 'should work with simple $and', ->
-    y { foo: bar: 1 }, { $and: [ { 'foo.bar': { $eq: 1 } }, { 'foo': $exists: true } ] }
+    y { foo: bar: 1 }, { $and: [ { 'foo.bar': { $eq: 1 } }, { foo: $exists: true } ] }
 
   it 'should work with simple $exists false', ->
     n { foo: bar: 1 }, { 'foo.bar': $exists: false }
