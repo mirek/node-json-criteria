@@ -121,6 +121,20 @@ describe 'ev', ->
       it 'should not match not in', ->
         n { foo: 1 }, { foo: $nin: [ 1, 2 ] }
 
+    describe 'element query ops', ->
+
+      it 'should match existance', ->
+        y { foo: bar: 1 }, { 'foo.bar': $exists: true }
+
+      it 'should not match existance', ->
+        n { foo: bar: 1 }, { 'foo.baz': $exists: true }
+
+      it 'should not match negative existance', ->
+        n { foo: bar: 1 }, { 'foo.bar': $exists: false }
+
+      it 'should match negative existance', ->
+        y { foo: bar: 1 }, { 'foo.baz': $exists: false }
+
   it 'should not match eq', ->
     n { foo: 1 }, { foo: { $eq: 2 } }
 
