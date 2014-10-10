@@ -28,7 +28,7 @@ ev = (d, q) ->
 
       # Evaluation query ops
       when '$mod' then (d % v[0]) is v[1]
-      when '$regex' then v.match(new RegExp(v, q.$options))?
+      when '$regex' then d.match(new RegExp(v, q.$options))?
       when '$options' then true # HACK
 
       when '$text' then false
