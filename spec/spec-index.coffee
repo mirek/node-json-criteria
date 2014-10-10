@@ -31,6 +31,28 @@ describe 'ev', ->
       it 'should not match single negatives', ->
         assert.equal false, $.ev { foo: 1 }, { $or: [ { 'foo2': $eq: 1 } ] }
 
+    describe '$nor', ->
+
+      it 'should not match single positive', ->
+        assert.equal false, $.ev { foo: 1 }, { $nor: [ { 'foo': $eq: 1 } ] }
+
+      it 'should match single negative', ->
+        assert.equal true, $.ev { foo: 1 }, { $nor: [ { 'foo': $eq: 2 } ] }
+
+      it 'should match two negatives', ->
+        assert.equal true, $.ev { foo: 1 }, { $nor: [ { 'foo': $eq: 2 }, { 'bar': $eq: 1 } ] }
+
+      it 'should not match one positive and one negative', ->
+        assert.equal false, $.ev { foo: 1 }, { $nor: [ { 'foo': $eq: 2 }, { 'foo': $eq: 1 } ] }
+
+    describe '$not', ->
+
+      it 'should not match negated positive equality', ->
+        assert.equal false, $.ev { foo: 1 }, { 'foo': $not: $eq: 1 }
+
+      it 'should match negated negative equality', ->
+        assert.equal true, $.ev { foo: 1 }, { 'foo': $not: $eq: 2 }
+
   it 'should work with nothing', ->
     assert.equal true, $.ev()
 
