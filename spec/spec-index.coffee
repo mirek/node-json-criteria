@@ -235,7 +235,13 @@ describe 'test', ->
         it 'should not match', ->
           n { foo: bar: [ 1, 3, 5 ] }, { 'foo.bar': $size: 1 }
 
-  describe 'corner cases', ->
+  describe 'others and corner cases', ->
+
+    it 'should match range', ->
+      y { foo: bar: 1 }, { 'foo.bar': { $gt: 0, $lte: 1 } }
+
+    it 'should not match range', ->
+      n { foo: bar: 2 }, { 'foo.bar': { $gt: 0, $lte: 1 } }
 
     it 'should match if nothing is provided', ->
       y null, null

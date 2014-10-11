@@ -7,11 +7,57 @@
 
 ## Usage
 
-Currently we're exposing single function `ev(doc, query)` which returns true on match and false otherwise.
+Exported functions:
 
-    var ev = require('json-criteria').ev
-    console.log(ev({ foo: bar: 123 }, { 'foo.bar': { $eq: 123 } })) // true
-    console.log(ev({ foo: bar: 123 }, { 'foo.bar': { $lt: 100 } })) // false
+* `test(doc, crit)` - returns true/false
+* `assert(doc, crit)` - throws if not matched
+
+Example:
+
+    var jc = require('json-criteria')
+    console.log(jc.test({ foo: bar: 123 }, { 'foo.bar': { $eq: 123 } })) // true
+    console.log(jc.test({ foo: bar: 123 }, { 'foo.bar': { $lt: 100 } })) // false
+
+Criteria queries follow MongoDB convention. You can use operators described at http://docs.mongodb.org/manual/reference/operator/query
+
+* logical ops
+  * `{ $and: [ ... ] }` - all of
+  * `{ $or: [ ... ] }` - any of
+  * `{ $nor: [ ... ] }` - none of
+  * `{ $not: ... }` - not, ie. `{ $not: { $gt: 0, $lt: 1 } }`
+* comparison ops
+  * `{ field: { $eq: ... } }` - is equal
+  * `{ field: { $ne: ... } }` - is not equal
+  * `{ field: { $gt: ... } }` - is greater than
+  * `{ field: { $gte: ... } }` - is greater than or equal
+  * `{ field: { $lt: ... } }` - is lower than
+  * `{ field: { $lte: ... } }` - is lower than or equal
+  * `{ field: { $in: [ ... ] } }` - at least one element matches value (or value's elements if array)
+  * `{ field: { $nin: [ ... ] } }` - none of elements match value (or value's elements if array)
+* element ops
+  * `{ field: { $exists: true/false } }` - field exists
+  * `{ field: { $type: 'number|string|...' } }` - matches field type
+* evaluation ops
+  * `{ field: { $mod: [ div, rem ] } }` - divided by div has reminder rem
+  * `{ field: { $regexp: '...', $options: 'i' } }` - matches regular expression with optional options
+  * `$text` - fts is not supported
+  * `{ field: { $where: function (v) { return true/false } } }` - performs test using provided function, for security purposes function body as string is not supported
+* geospatial ops - not supported atm
+* array ops
+  * `{ field: { $all: [ ... ] } }` - all of the values are in the field's value
+  * `{ field: { $elemMatch: ... } }` - at least one element matches
+  * `{ field: { $size: ... } }` - matches length of field's array value
+
+Example criteria queries:
+
+| document            | criteria                            | result |
+|---------------------|-------------------------------------|--------|
+| { foo: bar: 'abc' } | { 'foo.bar': $exists: true }        | true   |
+| { foo: bar: 'abc' } | { 'foo.baz': $exists: true }        | false  |
+| { foo: bar: 'abc' } | { 'foo.bar': { $eq: 'abc' } }       | true   |
+| { foo: bar: 1 }     | { 'foo.bar': { $gt: 0 } }           | true   |
+| { foo: bar: 1 }     | { 'foo.bar': { $gt: 0, $lt: 1 } }   | false  |
+| { foo: bar: 1 }     | { 'foo.bar': { $gt: 0, $lte: 1 } }  | true   |
 
 For more examples have a look at specs.
 
