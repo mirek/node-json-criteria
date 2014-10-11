@@ -9,9 +9,6 @@ describe 'ev', ->
 
   describe 'logical ops', ->
 
-    it 'should match nothing', ->
-      y null, null
-
     describe '$and', ->
 
       it 'should match two positives', ->
@@ -211,6 +208,14 @@ describe 'ev', ->
 
     describe 'array query ops', ->
 
+      describe '$all', ->
+
+        it 'should match', ->
+          y { foo: bar: [ 1, 3, 5 ] }, { 'foo.bar': $all: [ 5, 1 ] }
+
+        it 'should not match', ->
+          n { foo: bar: [ 1, 3, 5 ] }, { 'foo.bar': $all: [ 1, 2, 3, 5 ] }
+
       describe '$elemMatch', ->
 
         it 'should match', ->
@@ -222,23 +227,20 @@ describe 'ev', ->
         it 'should match with $where', ->
           y { foo: bar: [ 1, 3, 5 ] }, { 'foo.bar': $elemMatch: { $where: (v) -> v is 5 } }
 
-  it 'should not match eq', ->
-    n { foo: 1 }, { foo: { $eq: 2 } }
+      describe '$size', ->
 
-  it 'should not match non existing eq', ->
-    n { foo: 1 }, { 'foo2': { $eq: 1 } }
+        it 'should match', ->
+          y { foo: bar: [ 1, 3, 5 ] }, { 'foo.bar': $size: 3 }
 
-  it 'should work with simple $and', ->
-    y { foo: bar: 1 }, { $and: [ { 'foo.bar': { $eq: 1 } }, { foo: $exists: true } ] }
+        it 'should not match', ->
+          n { foo: bar: [ 1, 3, 5 ] }, { 'foo.bar': $size: 1 }
 
-  it 'should work with simple $exists false', ->
-    n { foo: bar: 1 }, { 'foo.bar': $exists: false }
+  describe 'corner cases', ->
 
-  it 'should work with simple $exists false 2', ->
-    n { foo: bar: 1 }, { 'foo.baz': $exists: true }
+    it 'should match if nothing is provided', ->
+      y null, null
+      y {}, null
+      y {}, {}
 
-  it 'should work with simple $exists false', ->
-    y { foo: bar: 1 }, { 'foo.bar': $exists: true }
-
-  it 'should not match lt', ->
-    n { foo: bar: 123 }, { 'foo.bar': { $lt: 100 } }
+    it 'should throw if op is not found', ->
+      assert.throws -> $.ev { foo: 1 }, { $foo: 1 }

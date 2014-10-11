@@ -43,11 +43,14 @@ ev = (d, q) ->
       when '$size' then v is (if Array.isArray(d) then d.length else 0)
 
       else
-        [ dvp, dk ] = resolve d, k
-        if dk.length is 1 # ...is resolved
-          ev dvp[dk[0]], v
+        unless k[0] is '$'
+          [ dvp, dk ] = resolve d, k
+          if dk.length is 1 # ...is resolved
+            ev dvp[dk[0]], v
+          else
+            ev null, v # we can match $exists false.
         else
-          ev null, v # we can match $exists false.
+          throw new Error "#{k} operator is not supported."
 
     # console.log JSON.stringify { k, v, q, r, s }
 
