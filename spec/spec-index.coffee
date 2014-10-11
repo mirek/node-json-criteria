@@ -2,10 +2,10 @@
 assert = require 'assert'
 $ = require '../src'
 
-y = (d, q) -> assert.equal true, $.ev d, q
-n = (d, q) -> assert.equal false, $.ev d, q
+y = (d, q) -> assert.equal true, $.test d, q
+n = (d, q) -> assert.equal false, $.test d, q
 
-describe 'ev', ->
+describe 'test', ->
 
   describe 'logical ops', ->
 
@@ -243,4 +243,4 @@ describe 'ev', ->
       y {}, {}
 
     it 'should throw if op is not found', ->
-      assert.throws -> $.ev { foo: 1 }, { $foo: 1 }
+      assert.throws -> $.test { foo: 1 }, { $foo: 1 }

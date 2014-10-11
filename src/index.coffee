@@ -1,18 +1,22 @@
 
 { resolve } = require 'rus-diff'
+assert = require 'assert'
 
 arrize = (a) -> if Array.isArray(a) then a else [ a ]
 
-ev = (d, q) ->
+# @param [Object] d Document
+# @param [Object] q Criteria query in MongoDB format
+# @return [Boolean] true on match, false otherwise
+test = (d, q) ->
   r = true
   for k, v of q
     s = switch k
 
       # Logical ops
-      when '$and' then v.reduce ((p, c) -> p and ev(d, c)), true
-      when '$or' then v.reduce ((p, c) -> p or ev(d, c)), false
-      when '$nor' then v.reduce ((p, c) -> p and not ev(d, c)), true
-      when '$not' then not ev(d, v)
+      when '$and' then v.reduce ((p, c) -> p and test(d, c)), true
+      when '$or' then v.reduce ((p, c) -> p or test(d, c)), false
+      when '$nor' then v.reduce ((p, c) -> p and not test(d, c)), true
+      when '$not' then not test(d, v)
 
       # Comparison ops
       when '$eq' then d is v
@@ -39,16 +43,16 @@ ev = (d, q) ->
 
       # Array query ops
       when '$all' then da = arrize(d); v.every (e) -> e in da
-      when '$elemMatch' then Array.isArray(d) and d.some (e) -> ev(e, v)
+      when '$elemMatch' then Array.isArray(d) and d.some (e) -> test(e, v)
       when '$size' then v is (if Array.isArray(d) then d.length else 0)
 
       else
         unless k[0] is '$'
           [ dvp, dk ] = resolve d, k
           if dk.length is 1 # ...is resolved
-            ev dvp[dk[0]], v
+            test dvp[dk[0]], v
           else
-            ev null, v # we can match $exists false.
+            test null, v # we can match $exists false.
         else
           throw new Error "#{k} operator is not supported."
 
@@ -59,6 +63,12 @@ ev = (d, q) ->
     break unless r
   r
 
+# @param [Object] d Document
+# @param [Object] q Criteria query in MongoDB format
+assert_ = (d, q) ->
+  assert.equal true, test d, q
+
 module.exports = {
-  ev
+  test
+  assert: assert_
 }
