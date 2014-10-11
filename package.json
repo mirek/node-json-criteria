@@ -1,6 +1,6 @@
 {
   "name": "json-criteria",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Evaluate criteria queries on JSON objects MongoDB style.",
   "main": "lib/index.js",
   "scripts": {
