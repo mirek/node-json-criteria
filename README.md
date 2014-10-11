@@ -1,6 +1,10 @@
 
 ## Summary [![Build Status](https://travis-ci.org/mirek/node-json-criteria.png?branch=master)](https://travis-ci.org/mirek/node-json-criteria)
 
+Invoke criteria queries in MongoDB format on JSON objects.
+
+MongoDB implements flexible query format expressed in condensed JSON format. This package brings this functionality to nodejs.
+
 ## Installation
 
     npm install json-criteria --save
@@ -60,6 +64,101 @@ Example criteria queries:
 | { foo: bar: 1 }     | { 'foo.bar': { $gt: 0, $lte: 1 } }  | true   |
 
 For more examples have a look at specs.
+
+# Example Use Case - Mocha API Specs
+
+One example of good use case for this functionality is writing tests for API calls.
+
+Let's say you've got JSON based RESTful API that you want to test using, let's say, mocha:
+
+    # spec/spec-my-api.coffee
+
+    assert = require 'assert'
+    request = require 'request'
+    endpoint = '...'
+
+    describe 'my api', ->
+      it 'should have zero users', (done) ->
+        request
+          .get "#{endpoint}/users/count"
+          .end (err, resp) ->
+            assert.ifError err
+            assert.equal 0, resp.body?.count
+            done err
+
+You can use criteria query like this:
+
+    # spec/spec-my-api.coffee
+
+    assert = require 'assert'
+    request = require 'request'
+    jc = require 'json-criteria'
+    endpoint = '...'
+
+    describe 'my api', ->
+      it 'should have zero users', (done) ->
+        request
+          .get "#{endpoint}/users/count"
+          .end (err, resp) ->
+            assert.ifError err
+            assert.ok js.test resp.body, { count: $eq: 0 }
+            done err
+
+Not that much of a change, but because we're using more expressive criteria query language now, we can
+refactor this test to it's own function with criteria parameter:
+
+    # spec/spec-my-api.coffee
+
+    assert = require 'assert'
+    request = require 'request'
+    jc = require 'json-criteria'
+    endpoint = '...'
+
+    get = (path, criteria, done) ->
+      request
+        .get "#{endpoint}/#{path}"
+        .end (err, resp) ->
+          assert.ifError err
+          assert.ok jc.test resp.body, criteria
+          done err
+
+    describe 'my api', ->
+      it 'should have zero users', (done) ->
+        get 'users/count', { count: $eq: 0 }, done
+
+We could stop here but if checking successul response structure is enough for our API test coverage we can refactor
+our function so it returns a function object:
+
+    # spec/spec-my-api.coffee
+
+    assert = require 'assert'
+    request = require 'request'
+    jc = require 'json-criteria'
+    endpoint = '...'
+
+    get = (path, criteria) ->
+      (done) ->
+        request
+          .get "#{endpoint}/#{path}"
+          .end (err, resp) ->
+            assert.ifError err
+            assert.ok jc.test resp.body, criteria
+            done err
+
+    describe 'my api', ->
+      it 'should have zero users', get 'users/count', { count: $eq: 0 }
+
+Other tests can be often expressed in a single or just few lines now:
+
+      it 'should have empty user list', get 'users', { users: $size: 0 }
+
+      it 'should have 3 to 5 products', get 'products', { 'meta.count': { $gt: 2, $lte: 5 } }
+
+      it 'should have 3 products with meta check', get 'products',
+        $and: [
+          { 'meta.count': { $eq: 3 } }
+          { products: $size: 3 }
+        ]
 
 ## License
 
