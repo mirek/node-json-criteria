@@ -68,7 +68,16 @@ test = (d, q) ->
 assert_ = (d, q) ->
   assert.equal true, test d, q
 
+pre = (args, cond, errcb) ->
+  if test args, cond
+    null
+  else
+    err = new Error "Unmet precondition"
+    errcb err if errcb?
+    err
+
 module.exports = {
-  test
   assert: assert_
+  pre
+  test
 }
