@@ -69,6 +69,11 @@ describe 'test', ->
         it 'should not match non existing', ->
           n { foo: 1 }, { bar: $eq: 2 }
 
+        it 'should match ext json', ->
+          y { updatedAt: { $date: 1413850114241 } }, { 'updatedAt.$date': $eq: 1413850114241 }
+          n { updatedAt: { $date: 1413850114241 } }, { 'updatedAt.$date': $eq: 1413850114242 }
+          n { updatedAt: { $date: 1413850114241 } }, { 'updatedAt.$date': $ne: 1413850114241 }
+
       describe '$ne', ->
 
         it 'should match', ->

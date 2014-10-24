@@ -49,7 +49,7 @@ test = (d, q) ->
       else
         unless k[0] is '$'
           [ dvp, dk ] = resolve d, k
-          if dk.length is 1 # ...is resolved
+          if dvp? and dk.length is 1 # ...is resolved
             test dvp[dk[0]], v
           else
             test null, v # we can match $exists false.
