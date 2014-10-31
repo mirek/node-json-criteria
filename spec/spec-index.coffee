@@ -242,6 +242,18 @@ describe 'test', ->
 
   describe 'others and corner cases', ->
 
+    it 'should match implicit $eq', ->
+      y { foo: 'foo' }, { foo: 'foo' }
+      n { foo: 'foo' }, { foo: 'bar' }
+      y { foo: 1 }, { foo: 1 }
+      n { foo: 1 }, { foo: 2 }
+      y { foo: true }, { foo: true }
+      n { foo: true }, { foo: false }
+      y { foo: null }, { foo: null }
+      n { foo: 'foo' }, { foo: null }
+      y { foo: 'foo', bar: 'bar' }, { foo: 'foo', bar: 'bar' }
+      n { foo: 'foo', bar: 'bar' }, { foo: 'bar', bar: 'bar' }
+
     it 'should match range', ->
       y { foo: bar: 1 }, { 'foo.bar': { $gt: 0, $lte: 1 } }
 

@@ -19,7 +19,7 @@ Exported functions:
 Example:
 
     var jc = require('json-criteria')
-    console.log(jc.test({ foo: bar: 123 }, { 'foo.bar': { $eq: 123 } })) // true
+    console.log(jc.test({ foo: bar: 123 }, { 'foo.bar': 123 })) // true
     console.log(jc.test({ foo: bar: 123 }, { 'foo.bar': { $lt: 100 } })) // false
 
 Criteria queries follow MongoDB convention. You can use operators described at http://docs.mongodb.org/manual/reference/operator/query
@@ -30,6 +30,7 @@ Criteria queries follow MongoDB convention. You can use operators described at h
   * `{ $nor: [ ... ] }` - none of
   * `{ $not: ... }` - not, ie. `{ $not: { $gt: 0, $lt: 1 } }`
 * comparison ops
+  * `{ field: ... }` - same as `$eq` for scalar values
   * `{ field: { $eq: ... } }` - is equal
   * `{ field: { $ne: ... } }` - is not equal
   * `{ field: { $gt: ... } }` - is greater than
@@ -54,7 +55,6 @@ Criteria queries follow MongoDB convention. You can use operators described at h
 
 Not supported:
 
-* `{ filed: value }` - implicit equality is not supported, use: `{ field: { $eq: ... } }` explicit equality operator instead.
 * `{ field: { $eq: { foo: ..., bar: ... } } }` - equality with deep object values are not supported yet, use scalar values instead.
 
 Example criteria queries:
@@ -63,6 +63,7 @@ Example criteria queries:
 |---------------------|-------------------------------------|--------|
 | { foo: bar: 'abc' } | { 'foo.bar': $exists: true }        | true   |
 | { foo: bar: 'abc' } | { 'foo.baz': $exists: true }        | false  |
+| { foo: bar: 'abc' } | { 'foo.bar': 'abc' }                | true   |
 | { foo: bar: 'abc' } | { 'foo.bar': { $eq: 'abc' } }       | true   |
 | { foo: bar: 1 }     | { 'foo.bar': { $gt: 0 } }           | true   |
 | { foo: bar: 1 }     | { 'foo.bar': { $gt: 0, $lt: 1 } }   | false  |
