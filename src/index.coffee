@@ -2,6 +2,7 @@
 { resolve } = require 'rus-diff'
 assert = require 'assert'
 
+isScalar = (v) -> (v is null) or (typeof v in ['string', 'number', 'boolean'])
 arrize = (a) -> if Array.isArray(a) then a else [ a ]
 
 # @param [Object] d Document
@@ -9,6 +10,7 @@ arrize = (a) -> if Array.isArray(a) then a else [ a ]
 # @return [Boolean] true on match, false otherwise
 test = (d, q) ->
   r = true
+
   for k, v of q
     s = switch k
 
@@ -50,6 +52,7 @@ test = (d, q) ->
         unless k[0] is '$'
           [ dvp, dk ] = resolve d, k
           if dvp? and dk.length is 1 # ...is resolved
+            if isScalar v then v = { $eq: v } # Implicit $eq
             test dvp[dk[0]], v
           else
             test null, v # we can match $exists false.
