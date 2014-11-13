@@ -25,8 +25,8 @@ test = (d, q) ->
       when '$lte' then d <= v
       when '$gt' then d > v
       when '$gte' then d >= v
-      when '$in' then da = arrize(d); v.some (e) -> e in da
-      when '$nin' then da = arrize(d); v.every (e) -> e not in da
+      when '$in' then da = arrize(d); arrize(v).some (e) -> e in da
+      when '$nin' then da = arrize(d); arrize(v).every (e) -> e not in da
 
       # Element query ops
       when '$exists' then not (v ^ d?)
@@ -49,10 +49,10 @@ test = (d, q) ->
       else
         unless k[0] is '$'
           [ dvp, dk ] = resolve d, k
-          if dvp? and dk.length is 1 # ...is resolved
+          if dvp? and dk.length is 1 # ...it's resolved
             test dvp[dk[0]], v
           else
-            test null, v # we can match $exists false.
+            test null, v # we can still match `{ $exists: false }`, possibly in nested `{ $or: [] }`.
         else
           throw new Error "#{k} operator is not supported."
 

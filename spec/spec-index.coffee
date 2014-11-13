@@ -134,6 +134,15 @@ describe 'test', ->
         it 'should not match in', ->
           n { foo: 1 }, { foo: $in: [ 2, 3, 4 ] }
 
+        it 'should match $in with scalar on the right', ->
+          y { foo: [ 1, 2, 3 ] }, { foo: $in: 2 }
+
+        it 'should not match $in with scalar on the right', ->
+          n { foo: [ 1, 2, 3 ] }, { foo: $in: 4 }
+
+        it 'should not match $in with scalar on the right', ->
+          y { foo: [ 1, 2, 3 ] }, { foo: $nin: 4 }
+
       describe '$nin', ->
 
         it 'should match not in', ->
@@ -255,3 +264,6 @@ describe 'test', ->
 
     it 'should throw if op is not found', ->
       assert.throws -> $.test { foo: 1 }, { $foo: 1 }
+
+    it 'should work', ->
+      n {"meta":{"duration":{"milliseconds":1,"seconds":0.001,"readable":{"seconds":"0.00 sec"}},"bg":false}}, {"group.name":{"$eq":"hello-a"},"meta.bg":{"$eq":0}}
