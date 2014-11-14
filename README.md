@@ -55,7 +55,6 @@ Criteria queries follow MongoDB convention. You can use operators described at h
 Not supported:
 
 * `{ filed: value }` - implicit equality is not supported, use: `{ field: { $eq: ... } }` explicit equality operator instead.
-* `{ field: { $eq: { foo: ..., bar: ... } } }` - equality with deep object values are not supported yet, use scalar values instead.
 
 Example criteria queries:
 

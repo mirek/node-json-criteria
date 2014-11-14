@@ -74,6 +74,12 @@ describe 'test', ->
           n { updatedAt: { $date: 1413850114241 } }, { 'updatedAt.$date': $eq: 1413850114242 }
           n { updatedAt: { $date: 1413850114241 } }, { 'updatedAt.$date': $ne: 1413850114241 }
 
+        it 'should match nested', ->
+          y { doc: { foo: 1, bar: 2 } }, { doc: $eq: { bar: 2, foo: 1 } }
+          n { doc: { foo: 1, bar: 2 } }, { doc: $ne: { bar: 2, foo: 1 } }
+          n { doc: { foo: 1, bar: 2 } }, { doc: $eq: { bar2: 2, foo: 1 } }
+          y { doc: { foo: 1, bar: baz: 2 } }, { doc: $eq: { bar: { baz: 2 }, foo: 1 } }
+
       describe '$ne', ->
 
         it 'should match', ->

@@ -2,7 +2,26 @@
 { resolve } = require 'rus-diff'
 assert = require 'assert'
 
+# Internal, converts non-array to array.
 arrize = (a) -> if Array.isArray(a) then a else [ a ]
+
+# Internal, equality test with object support.
+isdeep = (a, b) ->
+  if (typeof a is 'object') and (typeof b is 'object')
+    as = ({ k, v } for own k, v of a)
+    bs = ({ k, v } for own k, v of b)
+    if as.length is bs.length
+      sf = (x, y) -> x.k > y.k
+      as.sort sf
+      bs.sort sf
+      for { k, v }, i in as
+        unless isdeep(k, bs[i].k) and isdeep(v, bs[i].v)
+          return false
+      true
+    else
+      false
+  else
+    a is b
 
 # @param [Object] d Document
 # @param [Object] q Criteria query in MongoDB format
@@ -19,8 +38,8 @@ test = (d, q) ->
       when '$not' then not test(d, v)
 
       # Comparison ops
-      when '$eq' then d is v
-      when '$ne' then d isnt v
+      when '$eq' then isdeep d, v
+      when '$ne' then not isdeep d, v
       when '$lt' then d < v
       when '$lte' then d <= v
       when '$gt' then d > v
