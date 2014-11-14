@@ -257,6 +257,38 @@ describe 'test', ->
 
   describe 'others and corner cases', ->
 
+    it 'should match in namespace #1', ->
+      q = {
+        foo: {
+          beg: { $gt: 1 },
+          end: { $lt: 10 }
+        },
+        bar: {
+          beg: { $gt: 11 },
+          end: { $lt: 20 }
+        }
+      }
+      y { foo: { beg: 2, end: 9 }, bar: { beg: 12, end: 19 } }, q
+      n { foo: { beg: 1, end: 9 }, bar: { beg: 12, end: 19 } }, q
+      n { foo: { beg: 2, end: 10 }, bar: { beg: 12, end: 19 } }, q
+      n { foo: { beg: 2, end: 9 }, bar: { beg: 11, end: 19 } }, q
+      n { foo: { beg: 2, end: 9 }, bar: { beg: 12, end: 20 } }, q
+
+    it 'should match in namespace #2', ->
+      q = {
+        foo: {
+          $or: [
+            { $eq: 'max' }
+            { $gte: 10 }
+          ]
+        }
+      }
+      y { foo: 'max' }, q
+      y { foo: 10 }, q
+      y { foo: 11 }, q
+      n { foo: 9 }, q
+      n { foo: 'min' }, q
+
     it 'should match range', ->
       y { foo: bar: 1 }, { 'foo.bar': { $gt: 0, $lte: 1 } }
 
