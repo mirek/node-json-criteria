@@ -305,3 +305,33 @@ describe 'test', ->
 
     it 'should work', ->
       n {"meta":{"duration":{"milliseconds":1,"seconds":0.001,"readable":{"seconds":"0.00 sec"}},"bg":false}}, {"group.name":{"$eq":"hello-a"},"meta.bg":{"$eq":0}}
+
+    it 'should work with #1', ->
+      a = {
+        "meta": {
+          "duration": {
+            "milliseconds": 39,
+            "seconds": 0.039,
+            "readable": {
+              "seconds": "0.04 sec"
+            }
+          },
+          "timestamp": 1111111111.11,
+          "refresh": "affected",
+          "affected": {
+            "paths": [
+              "kafka.feed_click.domain.111111111111111111111111.name",
+              "kafka.feed_click.domain.111111111111111111111111.last_access",
+              "kafka.feed_click.domain.111111111111111111111111.count"
+            ]
+          }
+        },
+        "update": {
+          "ok": 1,
+          "nModified": 1,
+          "n": 1
+        }
+      }
+      y a, { update: { $eq: { "ok": 1, "nModified": 1, "n": 1 } } }
+      n a, { update: { $eq: { "ok": 1, "nModified": 2, "n": 1 } } }
+      n a, { update: { $eq: { "ok": 1, "nModified": 1, "x": 1 } } }

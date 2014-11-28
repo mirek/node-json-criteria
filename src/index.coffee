@@ -7,7 +7,7 @@ arrize = (a) -> if Array.isArray(a) then a else [ a ]
 
 # Internal, equality test with object support.
 isdeep = (a, b) ->
-  if (typeof a is 'object') and (typeof b is 'object')
+  if (a isnt null) and (b isnt null) and (typeof a is 'object') and (typeof b is 'object')
     as = ({ k, v } for own k, v of a)
     bs = ({ k, v } for own k, v of b)
     if as.length is bs.length
