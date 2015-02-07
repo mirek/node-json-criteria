@@ -29,8 +29,9 @@ module.exports = (grunt) ->
           reporter: 'spec'
           require: [
             'coffee-script'
+            '6to5/register'
           ]
-        src: [ 'spec/**/*.coffee' ]
+        src: [ 'spec/**/*.coffee', 'spec/**/*.js' ]
 
   grunt.registerTask 'test', [ 'mochaTest' ]
   grunt.registerTask 'compile', [ 'clean:lib', 'coffee' ]

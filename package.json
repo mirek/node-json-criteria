@@ -29,6 +29,7 @@
     "rus-diff": "0.0.8"
   },
   "devDependencies": {
+    "6to5": "^3.4.1",
     "coffee-script": "^1.8.0",
     "grunt": "^0.4.5",
     "grunt-cli": "^0.1.13",
