@@ -103,29 +103,17 @@ class Criteria {
         let [ t, f ] = this.rule(qk)
 
         switch (t) {
-
-          case 'expansions':
-            r = r && this.test(d, f)
-            break
-
-          case 'transforms':
-            r = r && this.test(f.bind(this)(d, qv), qv)
-            break
-
-          case 'conditions':
-            r = r && f.bind(this)(d, qv, q)
-            break
-
-          default:
-            throw new Error(`Unknown rule ${qk}`)
-
+          case 'expansions': r = r && this.test(d, f); break
+          case 'transforms': r = r && this.test(f.bind(this)(d, qv), qv); break
+          case 'conditions': r = r && f.bind(this)(d, qv, q); break
+          default: throw new Error(`Unknown rule ${qk}`)
         }
 
         if (r === false) {
           break
         }
       } else {
-        let [ dvp, dk ] = resolve(d, qk)
+        let [ dvp, dk ] = resolve(d, qk) || []
         if (dvp !== null && dk.length === 1) { // ...it's resolved
           r = r && this.test(dvp[dk[0]], qv)
         } else {
@@ -135,35 +123,76 @@ class Criteria {
     }
     return r
   }
-
 }
 
 let c = new Criteria()
 
-// Logical ops.
-
-c.append('conditions', '$and', (a) => { return a.reduce(((p, c) => p && this.test(a, c)), true) })
-c.append('conditions', '$or', (a) => { return a.reduce(((p, c) => p || this.test(a, c)), false) })
-c.append('conditions', '$nor', (a) => { return a.reduce(((p, c) => p && !this.test(a, c)), true) })
-c.append('conditions', '$not', (a) => { return !this.test(a, c) })
-
-// Equality ops.
+// Comparision
 
 c.append('conditions', '$eq', (a, b) => isdeep(a, b) )
-c.append('conditions', '$ne', (a, b) => !isdeep(a, b) )
-c.append('conditions', '$lt', (a, b) => a < b )
-c.append('conditions', '$lte', (a, b) => a <= b )
 c.append('conditions', '$gt', (a, b) => a > b )
 c.append('conditions', '$gte', (a, b) => a > b )
+c.append('conditions', '$lt', (a, b) => a < b )
+c.append('conditions', '$lte', (a, b) => a <= b )
+c.append('conditions', '$ne', (a, b) => !isdeep(a, b) )
 c.append('conditions', '$in', (a, b) => { let aa = arrize(a); arrize(b).some((e) => e in aa) } )
 c.append('conditions', '$nin', (a, b) => { let aa = arrize(a); arrize(b).every((e) => !(e in aa)) } )
 
+// Logical
+
+c.append('conditions', '$or', (a) => { return a.reduce(((p, c) => p || this.test(a, c)), false) })
+c.append('conditions', '$and', (a) => { return a.reduce(((p, c) => p && this.test(a, c)), true) })
+c.append('conditions', '$not', (a) => { return !this.test(a, c) })
+c.append('conditions', '$nor', (a) => { return a.reduce(((p, c) => p && !this.test(a, c)), true) })
+
+// Element
+
 c.append('conditions', '$exists', (a, b) => a ^ isvalue(b) )
-c.append('conditions', '$typeof', (a, b) => typeof(a) === b )
+c.append('conditions', '$typeof', (a, b) => typeof(a) === b ) // MongoDB discrepancy
 
+// Evaluation
+
+c.append('conditions', '$mod', (a, b) => (a % b[0]) === b[1] )
 c.append('conditions', '$regex', (a, b, c) => !!a.match(new RegExp(b, c.$options)) )
+c.append('expansions', '$options', true ) // hack
+// $text
+c.append('conditions', '$where', (a, b, c) => b(a) )
 
+// Geospatial
+
+// $geoWithin
+// $geoIntersects
+// $near
+// $nearSphere
+
+// Array
+
+c.append('conditions', '$all', (a, b) => { b.every((e) => e in a) } )
+c.append('conditions', '$elemMatch', (a, b) => { Array.isArray(a) && a.some((e) => this.test(e, b)) } )
+c.append('conditions', '$size', (a, b) => { Array.isArray(a) ? b.length : 0 } )
+
+// Extras
+
+c.append('expansions', '$integer', { $typeof: 'number', $mod: [ 1, 0 ] } )
+c.append('expansions', '$natural', { $typeof: 'number', $mod: [ 1, 0 ], $gte: 0 } )
 c.append('expansions', '$email', { $typeof: 'string', $regex: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i } )
+
+// $every
+// $any
+// $sorted
+// $unique
+// $type = array
+// $date:format
+// $date:iso
+// $keys
+// $exact / $iff
+// $creditcard
+// $guid
+// $hostname http://tools.ietf.org/html/rfc1123
+// $downcase
+// $upcase
+// $trim
+//
 
 c.append('transforms', '$length', (a) => {
   let r = undefined
