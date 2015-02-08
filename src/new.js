@@ -208,6 +208,12 @@ c.append('transforms', '$length', (a) => {
   return r
 })
 
+import * as strftime from './strftime'
+
+c.append('conditions', '$strftime', (a, b) => {
+  return strftime.test(b, a)
+})
+
 export function test (a, q) {
   return c.test(a, q)
 }

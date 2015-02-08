@@ -37,6 +37,14 @@ describe('test', () => {
     y({ foo: '54d72bbf562d4b42fc4802cd' }, { foo: { '$string-object-id': true } })
   })
 
+  it('should match $strftime', () => {
+    y({ foo: '2015-02-08' }, { foo: { $strftime: '%Y-%m-%d' } })
+    n({ foo: '2015-02-08a' }, { foo: { $strftime: '%Y-%m-%d' } })
+    n({ foo: '2015-02-8' }, { foo: { $strftime: '%Y-%m-%d' } })
+    n({ foo: '2015-2-8' }, { foo: { $strftime: '%Y-%m-%d' } })
+    n({ foo: 'bar' }, { foo: { $strftime: '%Y-%m-%d' } })
+  })
+
 })
 
 
