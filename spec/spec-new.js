@@ -29,6 +29,14 @@ describe('test', () => {
     n({ foo: 'mirekrusin.com' }, { foo: { $email: true } })
   })
 
+  it('should match $object-id', () => {
+    y({ foo: { $oid: '54d72bbf562d4b42fc4802cd' } }, { foo: { '$object-id': true } })
+    n({ foo: { $oid: '54d72bbf562d4b42fc4802c' } }, { foo: { '$object-id': true } })
+    n({ foo: { $oid: '54d72bbf562d4b42fc4802cda' } }, { foo: { '$object-id': true } })
+    n({ foo: '54d72bbf562d4b42fc4802cd' }, { foo: { '$object-id': true } })
+    y({ foo: '54d72bbf562d4b42fc4802cd' }, { foo: { '$string-object-id': true } })
+  })
+
 })
 
 

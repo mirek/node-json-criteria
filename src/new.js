@@ -113,7 +113,8 @@ class Criteria {
           break
         }
       } else {
-        let [ dvp, dk ] = resolve(d, qk) || []
+        let tqk = qk[0] === ' ' ? qk.slice(1) : qk // trim ' $foo' leading space
+        let [ dvp, dk ] = resolve(d, tqk) || []
         if (dvp !== null && dk.length === 1) { // ...it's resolved
           r = r && this.test(dvp[dk[0]], qv)
         } else {
@@ -176,6 +177,10 @@ c.append('conditions', '$size', (a, b) => { Array.isArray(a) ? b.length : 0 } )
 c.append('expansions', '$integer', { $typeof: 'number', $mod: [ 1, 0 ] } )
 c.append('expansions', '$natural', { $typeof: 'number', $mod: [ 1, 0 ], $gte: 0 } )
 c.append('expansions', '$email', { $typeof: 'string', $regex: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i } )
+
+c.append('expansions', '$hex', { $typeof: 'string', $regex: /^[0-9A-F]+$/i } )
+c.append('expansions', '$string-object-id', { $typeof: 'string', $regex: /^[0-9A-F]{24}$/i } )
+c.append('expansions', '$object-id', { ' $oid': { '$string-object-id': true } } )
 
 // $every
 // $any
