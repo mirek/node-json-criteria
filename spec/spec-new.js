@@ -64,6 +64,19 @@ describe('test', () => {
 
   })
 
+  describe('$not', () => {
+
+    it('should not match negated positive equality', () => {
+      n({ foo: 1 }, { foo: { $not: { $eq: 1 } } })
+    })
+
+    it('should match negated negative equality', () => {
+      y({ foo: 1 }, { foo: { $not: { $eq: 2 } } })
+    })
+
+  })
+
+
   it('should work with simple cases', () => {
     y({ foo: 1 }, { foo: { $eq: 1 } })
     n({ foo: 1 }, { foo: { $eq: 2 } })
