@@ -45,6 +45,11 @@ describe('test', () => {
     n({ foo: 'bar' }, { foo: { $strftime: '%Y-%m-%d' } })
   })
 
+  it('should match $date-iso', () => {
+    y({ foo: '2015-02-08T00:00:00Z' }, { foo: { '$date-iso': true } })
+    n({ foo: '2015-02-08 00:00:00Z' }, { foo: { '$date-iso': true } })
+  })
+
 })
 
 

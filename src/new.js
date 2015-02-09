@@ -214,6 +214,8 @@ c.append('conditions', '$strftime', (a, b) => {
   return strftime.test(b, a)
 })
 
+c.append('expansions', '$date-iso', { $strftime: '%Y-%m-%dT%H:%M:%S%Z' })
+
 export function test (a, q) {
   return c.test(a, q)
 }
