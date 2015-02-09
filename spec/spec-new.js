@@ -24,6 +24,26 @@ describe('test', () => {
 
   })
 
+  describe('$or', () => {
+
+    it('should match one positive', () => {
+      y({ foo: 1 }, { $or: [ { foo: { $gt: 0 } } ] })
+    })
+
+    it('should match one positive and one negative', () => {
+      y({ foo: 1 }, { $or: [ { foo: { $gt: 0 } }, { foo: { $lt: -1 } } ] })
+    })
+
+    it('should not match two negatives', () => {
+      n({ foo: 1 }, { $or: [ { foo: { $gt: 2 } }, { foo: { $lt: 0 } } ]})
+    })
+
+    it('should not match single negatives', () => {
+      n({ foo: 1 }, { $or: [ { 'foo2': { $eq: 1 } } ] })
+    })
+
+  })
+
   it('should work with simple cases', () => {
     y({ foo: 1 }, { foo: { $eq: 1 } })
     n({ foo: 1 }, { foo: { $eq: 2 } })
@@ -68,7 +88,6 @@ describe('test', () => {
   })
 
 })
-
 
 // console.log(c.test(
 //   {
