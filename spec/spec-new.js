@@ -44,6 +44,26 @@ describe('test', () => {
 
   })
 
+  describe('$nor', () => {
+
+    it('should not match single positive', () => {
+      n({ foo: 1 }, { $nor: [ { foo: { $eq: 1 } } ] })
+    })
+
+    it('should match single negative', () => {
+      y({ foo: 1 }, { $nor: [ { foo: { $eq: 2 } } ] })
+    })
+
+    it('should match two negatives', () => {
+      y({ foo: 1 }, { $nor: [ { foo: { $eq: 2 } }, { 'bar': { $eq: 1 } } ] })
+    })
+
+    it('should not match one positive and one negative', () => {
+      n({ foo: 1 }, { $nor: [ { foo: { $eq: 2 } }, { foo: { $eq: 1 } } ] })
+    })
+
+  })
+
   it('should work with simple cases', () => {
     y({ foo: 1 }, { foo: { $eq: 1 } })
     n({ foo: 1 }, { foo: { $eq: 2 } })
