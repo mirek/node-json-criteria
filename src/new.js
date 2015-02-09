@@ -97,16 +97,24 @@ class Criteria {
 
   test (d, q) {
     let r = true
+
+    // console.log('->', JSON.stringify({ d, q, this: !!this }, null, '  '))
+
     for (let [ qk, qv ] of kvs(q)) {
       if (qk[0] === '$') {
 
         let [ t, f ] = this.rule(qk)
 
-        switch (t) {
-          case 'expansions': r = r && this.test(d, f); break
-          case 'transforms': r = r && this.test(f.bind(this)(d, qv), qv); break
-          case 'conditions': r = r && f.bind(this)(d, qv, q); break
-          default: throw new Error(`Unknown rule ${qk}`)
+        try {
+          switch (t) {
+            case 'expansions': r = r && this.test(d, f); break
+            case 'transforms': r = r && this.test(f.bind(this)(d, qv), qv); break
+            case 'conditions': r = r && f.bind(this)(d, qv, q); break
+            default: throw new Error(`Unknown rule ${qk}`)
+          }
+        } catch (ex) {
+          // console.error('!!', { t, f, qk, qv, d, q, ex, stack: ex.stack.split("\n"), this: !!this })
+          r = false
         }
 
         if (r === false) {
@@ -122,6 +130,9 @@ class Criteria {
         }
       }
     }
+
+    // console.log('<-', JSON.stringify({ r, d, q }, null, '  '))
+
     return r
   }
 }
@@ -130,34 +141,34 @@ let c = new Criteria()
 
 // Comparision
 
-c.append('conditions', '$eq', (a, b) => isdeep(a, b) )
-c.append('conditions', '$gt', (a, b) => a > b )
-c.append('conditions', '$gte', (a, b) => a > b )
-c.append('conditions', '$lt', (a, b) => a < b )
-c.append('conditions', '$lte', (a, b) => a <= b )
-c.append('conditions', '$ne', (a, b) => !isdeep(a, b) )
-c.append('conditions', '$in', (a, b) => { let aa = arrize(a); arrize(b).some((e) => e in aa) } )
-c.append('conditions', '$nin', (a, b) => { let aa = arrize(a); arrize(b).every((e) => !(e in aa)) } )
+c.append('conditions', '$eq', function (a, b) { return isdeep(a, b) } )
+c.append('conditions', '$gt', function (a, b) { return a > b } )
+c.append('conditions', '$gte', function (a, b) { return a > b } )
+c.append('conditions', '$lt', function (a, b) { return a < b } )
+c.append('conditions', '$lte', function (a, b) { return a <= b } )
+c.append('conditions', '$ne', function (a, b) { return !isdeep(a, b) } )
+c.append('conditions', '$in', function (a, b) { let aa = arrize(a); return arrize(b).some((e) => e in aa) } )
+c.append('conditions', '$nin', function (a, b) { let aa = arrize(a); return arrize(b).every((e) => !(e in aa)) } )
 
 // Logical
 
-c.append('conditions', '$or', (a) => { return a.reduce(((p, c) => p || this.test(a, c)), false) })
-c.append('conditions', '$and', (a) => { return a.reduce(((p, c) => p && this.test(a, c)), true) })
-c.append('conditions', '$not', (a) => { return !this.test(a, c) })
-c.append('conditions', '$nor', (a) => { return a.reduce(((p, c) => p && !this.test(a, c)), true) })
+c.append('conditions', '$or', function (a, b) { return b.reduce(((p, c) => p || this.test(a, c)), false) })
+c.append('conditions', '$and', function (a, b) { return b.reduce(((p, c) => p && this.test(a, c)), true) })
+c.append('conditions', '$not', function (a, b) { return !this.test(a, b) })
+c.append('conditions', '$nor', function (a, b) { return b.reduce(((p, c) => p && !this.test(a, c)), true) })
 
 // Element
 
-c.append('conditions', '$exists', (a, b) => a ^ isvalue(b) )
-c.append('conditions', '$typeof', (a, b) => typeof(a) === b ) // MongoDB discrepancy
+c.append('conditions', '$exists', function (a, b) { return a ^ isvalue(b) })
+c.append('conditions', '$typeof', function (a, b) { return typeof(a) === b }) // MongoDB discrepancy
 
 // Evaluation
 
-c.append('conditions', '$mod', (a, b) => (a % b[0]) === b[1] )
-c.append('conditions', '$regex', (a, b, c) => !!a.match(new RegExp(b, c.$options)) )
+c.append('conditions', '$mod', function (a, b) { return (a % b[0]) === b[1] } )
+c.append('conditions', '$regex', function (a, b, c) { return !!a.match(new RegExp(b, c.$options)) } )
 c.append('expansions', '$options', true ) // hack
 // $text
-c.append('conditions', '$where', (a, b, c) => b(a) )
+c.append('conditions', '$where', function (a, b, c) { return b(a) } )
 
 // Geospatial
 
@@ -168,9 +179,9 @@ c.append('conditions', '$where', (a, b, c) => b(a) )
 
 // Array
 
-c.append('conditions', '$all', (a, b) => { b.every((e) => e in a) } )
-c.append('conditions', '$elemMatch', (a, b) => { Array.isArray(a) && a.some((e) => this.test(e, b)) } )
-c.append('conditions', '$size', (a, b) => { Array.isArray(a) ? b.length : 0 } )
+c.append('conditions', '$all', function (a, b) { return b.every((e) => e in a) } )
+c.append('conditions', '$elemMatch', function (a, b) { return Array.isArray(a) && a.some((e) => this.test(e, b)) } )
+c.append('conditions', '$size', function (a, b) { return Array.isArray(a) ? b.length : 0 } )
 
 // Extras
 
@@ -199,7 +210,7 @@ c.append('expansions', '$object-id', { ' $oid': { '$string-object-id': true } } 
 // $trim
 //
 
-c.append('transforms', '$length', (a) => {
+c.append('transforms', '$length', function (a) {
   let r = undefined
   let t = typeof(a)
   if (t === 'string' || (t === 'object' && a !== null && a.hasOwnProperty('length'))) {
@@ -210,7 +221,7 @@ c.append('transforms', '$length', (a) => {
 
 import * as strftime from './strftime'
 
-c.append('conditions', '$strftime', (a, b) => {
+c.append('conditions', '$strftime', function (a, b) {
   return strftime.test(b, a)
 })
 

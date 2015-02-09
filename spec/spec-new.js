@@ -7,6 +7,23 @@ let n = (a, q) => assert.equal(false, test(a, q))
 
 describe('test', () => {
 
+
+  describe('$and', () => {
+
+    it('should match two positives', () => {
+      y({ foo: { bar: '123' } }, { $and: [ { foo: { $exists: true } }, { 'foo.bar': { $eq: '123' } } ] })
+    })
+
+    it('should not match one positive and one negative', () => {
+      n({ foo: { bar: '123' } }, { $and: [ { foo: { $exists: true } }, { 'foo.bar': { $eq: '1234' } } ] })
+    })
+
+    it('should match nested positive', () => {
+      y({ foo: 1, bar: 2}, { $and: [ { $and: [ { foo: { $eq: 1 } } ] } ] })
+    })
+
+  })
+
   it('should work with simple cases', () => {
     y({ foo: 1 }, { foo: { $eq: 1 } })
     n({ foo: 1 }, { foo: { $eq: 2 } })
