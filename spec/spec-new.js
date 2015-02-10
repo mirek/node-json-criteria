@@ -76,6 +76,34 @@ describe('test', () => {
 
   })
 
+  describe('$eq', () => {
+
+    it('should match', () => {
+      y({ foo: 1 }, { foo: { $eq: 1 } })
+    })
+
+    it('should not match', () => {
+      n({ foo: 1 }, { foo: { $eq: 2 } })
+    })
+
+    it('should not match non existing', () => {
+      n({ foo: 1 }, { bar: { $eq: 2 } })
+    })
+
+    it('should match ext json', () => {
+      y({ updatedAt: { $date: 1413850114241 } }, { 'updatedAt.$date': { $eq: 1413850114241 } })
+      n({ updatedAt: { $date: 1413850114241 } }, { 'updatedAt.$date': { $eq: 1413850114242 } })
+      n({ updatedAt: { $date: 1413850114241 } }, { 'updatedAt.$date': { $ne: 1413850114241 } })
+    })
+
+    it('should match nested', () => {
+      y({ doc: { foo: 1, bar: 2 } }, { doc: { $eq: { bar: 2, foo: 1 } } })
+      n({ doc: { foo: 1, bar: 2 } }, { doc: { $ne: { bar: 2, foo: 1 } } })
+      n({ doc: { foo: 1, bar: 2 } }, { doc: { $eq: { bar2: 2, foo: 1 } } })
+      y({ doc: { foo: 1, bar: { baz: 2 } } }, { doc: { $eq: { bar: { baz: 2 }, foo: 1 } } })
+    })
+
+  })
 
   it('should work with simple cases', () => {
     y({ foo: 1 }, { foo: { $eq: 1 } })
