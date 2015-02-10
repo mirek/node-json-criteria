@@ -1,67 +1,8 @@
 
 import { resolve } from 'rus-diff'
-
-function isvalue (a) {
-  return a !== undefined && a !== null
-}
-
-function* kvs (a) {
-  for (let k of Object.keys(a)) {
-    if (a.hasOwnProperty(k)) {
-      yield [k, a[k]]
-    }
-  }
-}
-
-function isdeep (a, b) {
-  var as, bs, i, k, sf, v, _i, _len, _ref;
-  if ((a !== null) && (b !== null) && (typeof a === 'object') && (typeof b === 'object')) {
-    as = (function() {
-      var _results;
-      _results = [];
-      for (k in a) {
-        if (!__hasProp.call(a, k)) continue;
-        v = a[k];
-        _results.push({
-          k: k,
-          v: v
-        });
-      }
-      return _results;
-    })();
-    bs = (function() {
-      var _results;
-      _results = [];
-      for (k in b) {
-        if (!__hasProp.call(b, k)) continue;
-        v = b[k];
-        _results.push({
-          k: k,
-          v: v
-        });
-      }
-      return _results;
-    })();
-    if (as.length === bs.length) {
-      sf = function(x, y) {
-        return x.k > y.k;
-      };
-      as.sort(sf);
-      bs.sort(sf);
-      for (i = _i = 0, _len = as.length; _i < _len; i = ++_i) {
-        _ref = as[i], k = _ref.k, v = _ref.v;
-        if (!(isdeep(k, bs[i].k) && isdeep(v, bs[i].v))) {
-          return false;
-        }
-      }
-      return true;
-    } else {
-      return false;
-    }
-  } else {
-    return a === b;
-  }
-}
+import { kvs } from './utils'
+import * as is from './is'
+import same from './same'
 
 class Criteria {
 
@@ -141,12 +82,12 @@ let c = new Criteria()
 
 // Comparision
 
-c.append('conditions', '$eq', function (a, b) { return isdeep(a, b) } )
+c.append('conditions', '$eq', function (a, b) { return same(a, b) } )
 c.append('conditions', '$gt', function (a, b) { return a > b } )
 c.append('conditions', '$gte', function (a, b) { return a > b } )
 c.append('conditions', '$lt', function (a, b) { return a < b } )
 c.append('conditions', '$lte', function (a, b) { return a <= b } )
-c.append('conditions', '$ne', function (a, b) { return !isdeep(a, b) } )
+c.append('conditions', '$ne', function (a, b) { return !same(a, b) } )
 c.append('conditions', '$in', function (a, b) { let aa = arrize(a); return arrize(b).some((e) => e in aa) } )
 c.append('conditions', '$nin', function (a, b) { let aa = arrize(a); return arrize(b).every((e) => !(e in aa)) } )
 
@@ -159,7 +100,7 @@ c.append('conditions', '$nor', function (a, b) { return b.reduce(((p, c) => p &&
 
 // Element
 
-c.append('conditions', '$exists', function (a, b) { return a ^ isvalue(b) })
+c.append('conditions', '$exists', function (a, b) { return !((!!b) ^ !is.nil(a)) })
 c.append('conditions', '$typeof', function (a, b) { return typeof(a) === b }) // MongoDB discrepancy
 
 // Evaluation
@@ -180,8 +121,8 @@ c.append('conditions', '$where', function (a, b, c) { return b(a) } )
 // Array
 
 c.append('conditions', '$all', function (a, b) { return b.every((e) => e in a) } )
-c.append('conditions', '$elemMatch', function (a, b) { return Array.isArray(a) && a.some((e) => this.test(e, b)) } )
-c.append('conditions', '$size', function (a, b) { return Array.isArray(a) ? b.length : 0 } )
+c.append('conditions', '$elemMatch', function (a, b) { return is.array(a) && a.some((e) => this.test(e, b)) } )
+c.append('conditions', '$size', function (a, b) { return is.array(a) ? b.length : 0 } )
 
 // Extras
 
