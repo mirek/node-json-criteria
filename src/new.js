@@ -1,6 +1,5 @@
 
-import { resolve } from 'rus-diff'
-import { kvs } from './utils'
+import { kvs, arrize, resolve } from './utils'
 import * as is from './is'
 import same from './same'
 
@@ -54,7 +53,7 @@ class Criteria {
             default: throw new Error(`Unknown rule ${qk}`)
           }
         } catch (ex) {
-          // console.error('!!', { t, f, qk, qv, d, q, ex, stack: ex.stack.split("\n"), this: !!this })
+          console.error('!!', { t, f, qk, qv, d, q, ex, stack: ex.stack.split("\n"), this: !!this })
           r = false
         }
 
@@ -84,12 +83,12 @@ let c = new Criteria()
 
 c.append('conditions', '$eq', function (a, b) { return same(a, b) } )
 c.append('conditions', '$gt', function (a, b) { return a > b } )
-c.append('conditions', '$gte', function (a, b) { return a > b } )
+c.append('conditions', '$gte', function (a, b) { return a >= b } )
 c.append('conditions', '$lt', function (a, b) { return a < b } )
 c.append('conditions', '$lte', function (a, b) { return a <= b } )
 c.append('conditions', '$ne', function (a, b) { return !same(a, b) } )
-c.append('conditions', '$in', function (a, b) { let aa = arrize(a); return arrize(b).some((e) => e in aa) } )
-c.append('conditions', '$nin', function (a, b) { let aa = arrize(a); return arrize(b).every((e) => !(e in aa)) } )
+c.append('conditions', '$in', function (a, b) { let aa = arrize(a); return arrize(b).some((e) => aa.indexOf(e) >= 0) } )
+c.append('conditions', '$nin', function (a, b) { let aa = arrize(a); return arrize(b).every((e) => aa.indexOf(e) < 0) } )
 
 // Logical
 

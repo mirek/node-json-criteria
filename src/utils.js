@@ -1,4 +1,60 @@
 
+import * as is from './is'
+
+// Arrize path by splitting 'foo.bar' -> [ 'foo', 'bar' ], unless string starts with ' ' then
+// ' foo.bar' -> [ 'foo.bar' ]
+export function split (a) {
+  let r = undefined
+  if (a[0] === ' ') {
+    r = [ a.substring(1) ]
+  } else {
+    r = a.split('.')
+  }
+  return r
+}
+
+// # Resolve key path on an object.
+// #
+// # @example Example
+// #   a = hello: in: nested: world: '!'
+// #   console.log resolve a, 'hello.in.nested'
+// #   # [ { nested: { world: '!' } }, [ 'nested' ] ]
+// #
+// # @param [Object] a An object to perform resolve on.
+// # @param [String] path Key path.
+// # @return [Array] [obj, path] tuple where obj is a resolved object and path an
+// #   array with last component or multiple unresolved components.
+export function resolve (a, path) {
+  let stack = split(path)
+  let last = []
+
+  if (stack.length > 0) {
+    last.unshift(stack.pop())
+  }
+
+  let e = a
+  let k = undefined
+  while (!is.nil(k = stack.shift())) {
+    if (!is.nil(e[k])) {
+      e = e[k]
+    } else {
+      stack.unshift(k)
+      break
+    }
+  }
+
+  // Pull all unresolved components into last.
+  while (!is.nil((k = stack.pop()))) {
+    last.unshift(k)
+  }
+
+  return [ e, last ]
+}
+
+export function arrize (a) {
+  return Array.isArray(a) ? a : [ a ]
+}
+
 export function* kvs (a) {
   for (let k of Object.keys(a)) {
     if (a.hasOwnProperty(k)) {

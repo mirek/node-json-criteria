@@ -78,6 +78,12 @@ describe('test', () => {
 
   describe('$eq', () => {
 
+    it('should work with simple cases', () => {
+      y({ foo: 1 }, { foo: { $eq: 1 } })
+      n({ foo: 1 }, { foo: { $eq: 2 } })
+      n({ foo: 1 }, { foo: { $eq: '1' } })
+    })
+
     it('should match', () => {
       y({ foo: 1 }, { foo: { $eq: 1 } })
     })
@@ -105,10 +111,116 @@ describe('test', () => {
 
   })
 
-  it('should work with simple cases', () => {
-    y({ foo: 1 }, { foo: { $eq: 1 } })
-    n({ foo: 1 }, { foo: { $eq: 2 } })
-    n({ foo: 1 }, { foo: { $eq: '1' } })
+  describe('$ne', () => {
+
+    it('should match', () => {
+      y({ foo: 1 }, { foo: { $ne: 2 } })
+    })
+
+    it('should not match', () => {
+      n({ foo: 1 }, { foo: { $ne: 1 } })
+    })
+
+  })
+
+  describe('$lt', () => {
+
+    it('should match lower than', () => {
+      y({ foo: 1 }, { foo: { $lt: 2 } })
+    })
+
+    it('should not match lower than', () => {
+      n({ foo: 1 }, { foo: { $lt: 1 } })
+    })
+
+  })
+
+  describe('$lte', () => {
+
+    it('should match lower than or equal', () => {
+      y({ foo: 1 }, { foo: { $lte: 1 } })
+    })
+
+    it('should match lower than or equal 2', () => {
+      y({ foo: 1 }, { foo: { $lte: 2 } })
+    })
+
+    it('should not match lower than or qual', () => {
+      n({ foo: 1 }, { foo: { $lte: 0 } })
+    })
+
+  })
+
+  describe('$gt', () => {
+
+    it('should match greater than', () => {
+      y({ foo: 1 }, { foo: { $gt: 0 } })
+    })
+
+    it('should not match greater than', () => {
+      n({ foo: 1 }, { foo: { $gt: 1 } })
+    })
+
+  })
+
+  describe('$gte', () => {
+
+    it('should match greater than or equal', () => {
+      y({ foo: 1 }, { foo: { $gte: 1 } })
+    })
+
+    it('should match greater than or equal 2', () => {
+      y({ foo: 1 }, { foo: { $gte: 0 } })
+    })
+
+    it('should not match greater than or qual', () => {
+      n({ foo: 1 }, { foo: { $gte: 2 } })
+    })
+
+  })
+
+  describe('$in', () => {
+
+    it('should match in', () => {
+      y({ foo: 1 }, { foo: { $in: [ 1 ] } })
+    })
+
+    it('should match in array', () => {
+      y({ foo: [ 1, 2, 3 ] }, { foo: { $in: [ 2 ] } })
+    })
+
+    it('should match in with more options', () => {
+      y({ foo: 1 }, { foo: { $in: [ 2, 3, 1, 4 ] } })
+    })
+
+    it('should not match in', () => {
+      n({ foo: 1 }, { foo: { $in: [ 2, 3, 4 ] } })
+    })
+
+    it('should match $in with scalar on the right', () => {
+      y({ foo: [ 1, 2, 3 ] }, { foo: { $in: 2 } })
+    })
+
+    it('should not match $in with scalar on the right', () => {
+      n({ foo: [ 1, 2, 3 ] }, { foo: { $in: 4 } })
+    })
+
+    it('should not match $in with scalar on the right', () => {
+      y({ foo: [ 1, 2, 3 ] }, { foo: { $nin: 4 } })
+    })
+
+  })
+
+  describe('$nin', () => {
+
+    it('should match not in', () => {
+      y({ foo: 1 }, { foo: { $nin: [ 2, 3, 4 ] } })
+    })
+
+    it('should not match not in', () => {
+      n({ foo: 1 }, { foo: { $nin: [ 1, 2 ] } })
+    })
+
   })
 
   it('should test $length', () => {
@@ -149,20 +261,3 @@ describe('test', () => {
   })
 
 })
-
-// console.log(c.test(
-//   {
-//     account: {
-//       name: "mirek",
-//       password: "secret",
-//       email: "mirek@me.com"
-//     }
-//   }
-// ,
-//   {
-//     account: {
-//       $exists: false,
-//       name: { $typeof: 'string', $length: { $gt: 0, $lte: 10 } }
-//     }
-//   }
-// ))
