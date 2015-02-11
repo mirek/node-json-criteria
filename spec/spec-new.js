@@ -1,6 +1,6 @@
 
 import assert from 'assert'
-import { test } from '../src/new'
+import { test } from '../src'
 
 let y = (a, q) => assert.equal(true, test(a, q))
 let n = (a, q) => assert.equal(false, test(a, q))

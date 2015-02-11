@@ -34,8 +34,8 @@ export function resolve (a, path) {
 
   let e = a
   let k = undefined
-  while (!is.nil(k = stack.shift())) {
-    if (!is.nil(e[k])) {
+  while (!is.none(k = stack.shift())) {
+    if (!is.none(e[k])) {
       e = e[k]
     } else {
       stack.unshift(k)
@@ -44,7 +44,7 @@ export function resolve (a, path) {
   }
 
   // Pull all unresolved components into last.
-  while (!is.nil((k = stack.pop()))) {
+  while (!is.none((k = stack.pop()))) {
     last.unshift(k)
   }
 
@@ -56,9 +56,11 @@ export function arrize (a) {
 }
 
 export function* kvs (a) {
-  for (let k of Object.keys(a)) {
-    if (a.hasOwnProperty(k)) {
-      yield [k, a[k]]
+  if (is.object(a)) {
+    for (let k of Object.keys(a)) {
+      if (a.hasOwnProperty(k)) {
+        yield [k, a[k]]
+      }
     }
   }
 }

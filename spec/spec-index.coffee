@@ -1,9 +1,11 @@
 
-assert = require 'assert'
-$ = require '../src'
+require '6to5/register'
 
-y = (d, q) -> assert.equal true, $.test d, q
-n = (d, q) -> assert.equal false, $.test d, q
+assert = require 'assert'
+{ test } = require '../src/engine/mongo'
+
+y = (d, q) -> assert.equal true, test d, q
+n = (d, q) -> assert.equal false, test d, q
 
 describe 'test', ->
 
@@ -298,12 +300,16 @@ describe 'test', ->
     it 'should match if nothing is provided', ->
       y null, null
       y {}, null
+      y null, {}
       y {}, {}
 
     it 'should throw if op is not found', ->
-      assert.throws -> $.test { foo: 1 }, { $foo: 1 }
+      assert.throws -> test { foo: 1 }, { $foo: 1 }
 
-    it 'should work', ->
+    it 'should work with example #0', ->
+      y {"meta":{"duration":{"milliseconds":1,"seconds":0.001,"readable":{"seconds":"0.00 sec"}},"bg":false},"group":{"name":"hello-a"}}, {"group.name":{"$eq":"hello-a"},"meta.bg":{"$eq":false}}
+
+    it 'should work with example #1', ->
       n {"meta":{"duration":{"milliseconds":1,"seconds":0.001,"readable":{"seconds":"0.00 sec"}},"bg":false}}, {"group.name":{"$eq":"hello-a"},"meta.bg":{"$eq":0}}
 
     it 'should work with #1', ->
