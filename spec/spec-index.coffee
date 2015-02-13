@@ -9,18 +9,6 @@ n = (d, q) -> assert.equal false, test d, q
 
 describe 'test', ->
 
-  describe 'logical ops', ->
-
-    describe 'array query ops', ->
-
-      describe '$size', ->
-
-        it 'should match', ->
-          y { foo: bar: [ 1, 3, 5 ] }, { 'foo.bar': $size: 3 }
-
-        it 'should not match', ->
-          n { foo: bar: [ 1, 3, 5 ] }, { 'foo.bar': $size: 1 }
-
   describe 'others and corner cases', ->
 
     it 'should match in namespace #1', ->

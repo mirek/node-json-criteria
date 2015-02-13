@@ -358,6 +358,18 @@ describe('test', () => {
 
   })
 
+  describe('$size', () => {
+
+    it('should match', () => {
+      y({ foo: { bar: [ 1, 3, 5 ] } }, { 'foo.bar': { $size: 3 } })
+    })
+
+    it('should not match', () => {
+      n({ foo: { bar: [ 1, 3, 5 ] } }, { 'foo.bar': { $size: 1 } })
+    })
+    
+  })
+
   // describe '$type', ->
   //
   //   it 'should match number type', ->
