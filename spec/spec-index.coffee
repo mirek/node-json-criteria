@@ -13,17 +13,6 @@ describe 'test', ->
 
     describe 'array query ops', ->
 
-      describe '$elemMatch', ->
-
-        it 'should match', ->
-          y { foo: bar: [ 1, 3, 5 ] }, { 'foo.bar': $elemMatch: { $eq: 3 } }
-
-        it 'should not match', ->
-          n { foo: bar: [ 1, 3, 5 ] }, { 'foo.bar': $elemMatch: { $eq: 4 } }
-
-        it 'should match with $where', ->
-          y { foo: bar: [ 1, 3, 5 ] }, { 'foo.bar': $elemMatch: { $where: (v) -> v is 5 } }
-
       describe '$size', ->
 
         it 'should match', ->

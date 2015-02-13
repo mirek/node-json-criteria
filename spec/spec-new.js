@@ -342,6 +342,22 @@ describe('test', () => {
 
   })
 
+  describe('$elemMatch', () => {
+
+    it('should match', () => {
+      y({ foo: { bar: [ 1, 3, 5 ] } }, { 'foo.bar': { $elemMatch: { $eq: 3 } } })
+    })
+
+    it('should not match', () => {
+      n({ foo: { bar: [ 1, 3, 5 ] } }, { 'foo.bar': { $elemMatch: { $eq: 4 } } })
+    })
+
+    it('should match with $where', () => {
+      y({ foo: { bar: [ 1, 3, 5 ] } }, { 'foo.bar': { $elemMatch: { $where: (v) => v == 5 } } })
+    })
+
+  })
+
   // describe '$type', ->
   //
   //   it 'should match number type', ->
