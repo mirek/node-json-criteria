@@ -266,6 +266,41 @@ describe('test', () => {
 
   })
 
+  describe('$exists', () => {
+
+    it('should match existance', () => {
+      y({ foo: { bar: 1 } }, { 'foo.bar': { $exists: true } })
+    })
+
+    it('should not match existance', () => {
+      n({ foo: { bar: 1 } }, { 'foo.baz': { $exists: true } })
+    })
+
+    it('should not match negative existance', () => {
+      n({ foo: { bar: 1 } }, { 'foo.bar': { $exists: false } })
+    })
+
+    it('should match negative existance', () => {
+      y({ foo: { bar: 1 } }, { 'foo.baz': { $exists: false } })
+    })
+
+  })
+
+  // describe '$type', ->
+  //
+  //   it 'should match number type', ->
+  //     y { foo: bar: 1.2 }, { 'foo.bar': $type: 'number' }
+  //
+  //   it 'should match boolean type', ->
+  //     y { foo: bar: true }, { 'foo.bar': $type: 'boolean' }
+  //
+  //   it 'should match string type', ->
+  //     y { foo: bar: 'foo' }, { 'foo.bar': $type: 'string' }
+  //
+  //   it 'should match object type', ->
+  //     y { foo: bar: /foo/ }, { 'foo.bar': $type: 'object' }
+  //     y { foo: bar: new Date() }, { 'foo.bar': $type: 'object' }
+
   it('should test $length', () => {
     n({ foo: null }, { foo: { $length: { $gt: 1, $lt: 5 } } })
     n({ foo: '' }, { foo: { $length: { $gt: 1, $lt: 5 } } })
