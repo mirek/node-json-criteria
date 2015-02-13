@@ -3,6 +3,16 @@ import * as is from './is'
 import same from './same'
 import { kvs, resolve } from './utils'
 
+// Decode query key from '_$foo' -> '$foo'. Encoding allows to refer to document attributes which would conflict with
+// ops.
+function decoded (qk) {
+  let r = qk
+  if (qk[0] === '_' && qk[1] === '$') {
+    r = qk.substr(1)
+  }
+  return r
+}
+
 export default class Engine {
 
   constructor ({ virtuals = [], conditions = [], expansions = []} = {}) {
@@ -55,30 +65,37 @@ export default class Engine {
   test (d, q = {}) {
     let r = true
 
-    // console.log('->', JSON.stringify({ d, q, this: !!this }, null, '  '))
+    // console.log('->', JSON.stringify({ d, q, leaf: is.leaf(q) }, null, '  '))
 
-    for (let [ qk, qv ] of kvs(q)) {
-      if (qk[0] === '$') {
+    if (is.leaf(q)) {
+      r = r && this.test(d, { $eq: q })
+    } else {
+      for (let [ qk, qv ] of kvs(q)) {
+        if (qk[0] === '$') {
 
-        let [ t, f ] = this.rule(qk)
+          let [ t, f ] = this.rule(qk)
 
-        switch (t) {
-          case 'expansions': r = r && this.test(d, f); break
-          case 'virtuals': r = r && this.test(f.bind(this)(d, qv), qv); break
-          case 'conditions': r = r && f.bind(this)(d, qv, q); break
-          default: throw new Error(`Unknown rule ${qk}`)
-        }
+          // console.log('t>', t, f)
 
-        if (r === false) {
-          break
-        }
-      } else {
-        let tqk = qk[0] === ' ' ? qk.slice(1) : qk // trim ' $foo' leading space
-        let [ dvp, dk ] = resolve(d, tqk) || []
-        if (dvp !== null && dk.length === 1) { // ...it's resolved
-          r = r && this.test(dvp[dk[0]], qv)
+          switch (t) {
+            case 'expansions': r = r && this.test(d, f); break
+            case 'virtuals': r = r && this.test(f.bind(this)(d, qv), qv); break
+            case 'conditions': r = r && f.bind(this)(d, qv, q); break
+            default: throw new Error(`Unknown rule ${qk}`)
+          }
+
+          if (r === false) {
+            break
+          }
         } else {
-          r = r && this.test(undefined, qv) // we can still match `{ $exists: false }`, possibly in nested `{ $or: [] }`.
+          let tqk = decoded(qk) // Allow _$foo to reference $foo attributes.
+          // console.log('d>', tqk)
+          let [ dvp, dk ] = resolve(d, tqk) || []
+          if (dvp !== null && dk.length === 1) { // ...it's resolved
+            r = r && this.test(dvp[dk[0]], qv)
+          } else {
+            r = r && this.test(undefined, qv) // we can still match `{ $exists: false }`, possibly in nested `{ $or: [] }`.
+          }
         }
       }
     }

@@ -299,8 +299,8 @@ describe 'test', ->
 
     it 'should match if nothing is provided', ->
       y null, null
-      y {}, null
-      y null, {}
+      n {}, null
+      n null, {}
       y {}, {}
 
     it 'should throw if op is not found', ->

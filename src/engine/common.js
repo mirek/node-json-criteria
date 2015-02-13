@@ -38,7 +38,7 @@ common.append('conditions', '$exists', function (a, b) { return !((!!b) ^ !is.no
 
 common.append('conditions', '$mod', function (a, b) { return (a % b[0]) === b[1] } )
 common.append('conditions', '$regex', function (a, b, c) { return !!a.match(new RegExp(b, c.$options)) } )
-common.append('expansions', '$options', true ) // TODO: FIXME: HACK:
+common.append('conditions', '$options', function () { return true } ) // HACK: MongoDB is weird referring to sibling
 // $text
 common.append('conditions', '$where', function (a, b, c) { return b(a) } )
 

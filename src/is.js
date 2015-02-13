@@ -77,3 +77,15 @@ export function args (a) {
 export function buffer (a) {
   return Buffer != null ? Buffer.isBuffer(a) : false
 }
+
+// Leaf is a value that we can't decend into.
+export function leaf (a) {
+  let r = true
+  switch (true) {
+    case array(a) && a.length > 0:
+    case object(a) && Object.keys(a).length > 0:
+      r = false
+      break
+  }
+  return r
+}
