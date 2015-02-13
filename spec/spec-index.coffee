@@ -13,18 +13,6 @@ describe 'test', ->
 
     describe 'evaluation ops', ->
 
-      describe '$mod', ->
-
-        it 'should match', ->
-          y { foo: bar: 5 }, { 'foo.bar': $mod: [ 5, 0 ] }
-          y { foo: bar: 5 }, { 'foo.bar': $mod: [ 3, 2 ] }
-          y { foo: bar: 5 }, { 'foo.bar': $mod: [ 2, 1 ] }
-
-        it 'should not match', ->
-          n { foo: bar: 5 }, { 'foo.bar': $mod: [ 5, 1 ] }
-          n { foo: bar: 5 }, { 'foo.bar': $mod: [ 3, 3 ] }
-          n { foo: bar: 5 }, { 'foo.bar': $mod: [ 2, 0 ] }
-
       describe '$regex', ->
 
         it 'should match', ->
