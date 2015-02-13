@@ -11,17 +11,7 @@ describe 'test', ->
 
   describe 'logical ops', ->
 
-    describe 'evaluation ops', ->
-
     describe 'array query ops', ->
-
-      describe '$all', ->
-
-        it 'should match', ->
-          y { foo: bar: [ 1, 3, 5 ] }, { 'foo.bar': $all: [ 5, 1 ] }
-
-        it 'should not match', ->
-          n { foo: bar: [ 1, 3, 5 ] }, { 'foo.bar': $all: [ 1, 2, 3, 5 ] }
 
       describe '$elemMatch', ->
 

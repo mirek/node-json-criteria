@@ -330,6 +330,18 @@ describe('test', () => {
 
   })
 
+  describe('$all', () => {
+
+    it('should match', () => {
+      y({ foo: { bar: [ 1, 3, 5 ] } }, { 'foo.bar': { $all: [ 5, 1 ] } })
+    })
+
+    it('should not match', () => {
+      n({ foo: { bar: [ 1, 3, 5 ] } }, { 'foo.bar': { $all: [ 1, 2, 3, 5 ] } })
+    })
+
+  })
+
   // describe '$type', ->
   //
   //   it 'should match number type', ->
