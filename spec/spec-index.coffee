@@ -13,19 +13,6 @@ describe 'test', ->
 
     describe 'evaluation ops', ->
 
-      # describe '$text', ->
-      #
-      #   it 'should not work', ->
-      #     n { foo: 'bar' }, { $text: 'bar' }
-
-      describe '$where', ->
-
-        it 'should match', ->
-          y { foo: bar: 'x' }, { 'foo.bar': $where: (v) -> v is 'x'  }
-
-        it 'should not match', ->
-          n { foo: bar: 'x' }, { 'foo.bar': $where: (v) -> v isnt 'x'  }
-
     describe 'array query ops', ->
 
       describe '$all', ->

@@ -315,7 +315,19 @@ describe('test', () => {
     it('should match case insensitive', () => {
       y({ foo: { bar: 'BAZ' } }, { 'foo.bar': { $regex: '^baz$', $options: 'i' } })
     })
-    
+
+  })
+
+  describe('$where', () => {
+
+    it('should match', () => {
+      y({ foo: { bar: 'x' } }, { 'foo.bar': { $where: (v) => v === 'x' } })
+    })
+
+    it('should not match', () => {
+      n({ foo: { bar: 'x' } }, { 'foo.bar': { $where: (v) => v !== 'x' } })
+    })
+
   })
 
   // describe '$type', ->
