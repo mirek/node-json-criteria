@@ -302,6 +302,22 @@ describe('test', () => {
 
   })
 
+  describe('$regex', () => {
+
+    it('should match', () => {
+      y({ foo: { bar: 'baz' } }, { 'foo.bar': { $regex: '^ba.$' } })
+    })
+
+    it('should not match', () => {
+      n({ foo: { bar: 'baz' } }, { 'foo.bar': { $regex: '^bb.$' } })
+    })
+
+    it('should match case insensitive', () => {
+      y({ foo: { bar: 'BAZ' } }, { 'foo.bar': { $regex: '^baz$', $options: 'i' } })
+    })
+    
+  })
+
   // describe '$type', ->
   //
   //   it 'should match number type', ->
