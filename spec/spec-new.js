@@ -7,19 +7,44 @@ let n = (a, q) => assert.equal(false, test(a, q))
 
 describe('test', () => {
 
+  describe('implicit $eq', () => {
+    y({ foo: 1 }, { foo: 1 })
+    n({ bar: 1 }, { foo: 1 })
+    n({ foo: 1 }, { foo: 2 })
+    n({ foo: 1 }, { foo: '1' })
+    y({ foo: { bar: 1, baz: 1 } }, { foo: { baz: 1, bar: 1 } })
+    n({ foo: { bar: 1, baz: 1 } }, { foo: { baz: 1, bar: '1' } })
+    y({ foo: { bar: 2, baz: 1 } }, { 'foo.baz': 1, 'foo.bar': 2 })
+    y({ foo: { bar: 2, baz: 1 } }, { $or: [ { 'foo.baz': 2 }, { 'foo.bar': 2 } ]})
+  })
+
+  describe('type errors', () => {
+    it('should throw for $and: {}', () => {
+      assert.throws(() => test({}, { $and: {} }), TypeError)
+    })
+    it('should throw for $or: {}', () => {
+      assert.throws(() => test({}, { $or: {} }), TypeError)
+    })
+    it('should throw for $nor: {}', () => {
+      assert.throws(() => test({}, { $nor: {} }), TypeError)
+    })
+  })
 
   describe('$and', () => {
 
     it('should match two positives', () => {
       y({ foo: { bar: '123' } }, { $and: [ { foo: { $exists: true } }, { 'foo.bar': { $eq: '123' } } ] })
+      y({ foo: { bar: '123' } }, { $and: [ { foo: { $exists: true } }, { 'foo.bar': '123' } ] })
     })
 
     it('should not match one positive and one negative', () => {
       n({ foo: { bar: '123' } }, { $and: [ { foo: { $exists: true } }, { 'foo.bar': { $eq: '1234' } } ] })
+      n({ foo: { bar: '123' } }, { $and: [ { foo: { $exists: true } }, { 'foo.bar': '1234' } ] })
     })
 
     it('should match nested positive', () => {
       y({ foo: 1, bar: 2}, { $and: [ { $and: [ { foo: { $eq: 1 } } ] } ] })
+      y({ foo: 1, bar: 2}, { $and: [ { $and: [ { foo: 1 } ] } ] })
     })
 
   })
@@ -40,6 +65,7 @@ describe('test', () => {
 
     it('should not match single negatives', () => {
       n({ foo: 1 }, { $or: [ { 'foo2': { $eq: 1 } } ] })
+      n({ foo: 1 }, { $or: [ { 'foo2': 1 } ] })
     })
 
   })
@@ -48,18 +74,22 @@ describe('test', () => {
 
     it('should not match single positive', () => {
       n({ foo: 1 }, { $nor: [ { foo: { $eq: 1 } } ] })
+      n({ foo: 1 }, { $nor: [ { foo: 1 } ] })
     })
 
     it('should match single negative', () => {
       y({ foo: 1 }, { $nor: [ { foo: { $eq: 2 } } ] })
+      y({ foo: 1 }, { $nor: [ { foo: 2 } ] })
     })
 
     it('should match two negatives', () => {
       y({ foo: 1 }, { $nor: [ { foo: { $eq: 2 } }, { 'bar': { $eq: 1 } } ] })
+      y({ foo: 1 }, { $nor: [ { foo: 2 }, { 'bar': 1 } ] })
     })
 
     it('should not match one positive and one negative', () => {
       n({ foo: 1 }, { $nor: [ { foo: { $eq: 2 } }, { foo: { $eq: 1 } } ] })
+      n({ foo: 1 }, { $nor: [ { foo: 2 }, { foo: 1 } ] })
     })
 
   })
@@ -68,10 +98,12 @@ describe('test', () => {
 
     it('should not match negated positive equality', () => {
       n({ foo: 1 }, { foo: { $not: { $eq: 1 } } })
+      n({ foo: 1 }, { foo: { $not: 1 } })
     })
 
     it('should match negated negative equality', () => {
       y({ foo: 1 }, { foo: { $not: { $eq: 2 } } })
+      y({ foo: 1 }, { foo: { $not: 2 } })
     })
 
   })
@@ -80,33 +112,44 @@ describe('test', () => {
 
     it('should work with simple cases', () => {
       y({ foo: 1 }, { foo: { $eq: 1 } })
+      y({ foo: 1 }, { foo: 1 })
       n({ foo: 1 }, { foo: { $eq: 2 } })
+      n({ foo: 1 }, { foo: 2 })
       n({ foo: 1 }, { foo: { $eq: '1' } })
+      n({ foo: 1 }, { foo: '1' })
     })
 
     it('should match', () => {
       y({ foo: 1 }, { foo: { $eq: 1 } })
+      y({ foo: 1 }, { foo: 1 })
     })
 
     it('should not match', () => {
       n({ foo: 1 }, { foo: { $eq: 2 } })
+      n({ foo: 1 }, { foo: 2 })
     })
 
     it('should not match non existing', () => {
       n({ foo: 1 }, { bar: { $eq: 2 } })
+      n({ foo: 1 }, { bar: 2 })
     })
 
     it('should match ext json', () => {
       y({ updatedAt: { $date: 1413850114241 } }, { 'updatedAt.$date': { $eq: 1413850114241 } })
+      y({ updatedAt: { $date: 1413850114241 } }, { 'updatedAt.$date': 1413850114241 })
       n({ updatedAt: { $date: 1413850114241 } }, { 'updatedAt.$date': { $eq: 1413850114242 } })
+      n({ updatedAt: { $date: 1413850114241 } }, { 'updatedAt.$date': 1413850114242 })
       n({ updatedAt: { $date: 1413850114241 } }, { 'updatedAt.$date': { $ne: 1413850114241 } })
     })
 
     it('should match nested', () => {
       y({ doc: { foo: 1, bar: 2 } }, { doc: { $eq: { bar: 2, foo: 1 } } })
+      y({ doc: { foo: 1, bar: 2 } }, { doc: { bar: 2, foo: 1 } })
       n({ doc: { foo: 1, bar: 2 } }, { doc: { $ne: { bar: 2, foo: 1 } } })
       n({ doc: { foo: 1, bar: 2 } }, { doc: { $eq: { bar2: 2, foo: 1 } } })
+      n({ doc: { foo: 1, bar: 2 } }, { doc: { bar2: 2, foo: 1 } })
       y({ doc: { foo: 1, bar: { baz: 2 } } }, { doc: { $eq: { bar: { baz: 2 }, foo: 1 } } })
+      y({ doc: { foo: 1, bar: { baz: 2 } } }, { doc: { bar: { baz: 2 }, foo: 1 } })
     })
 
   })

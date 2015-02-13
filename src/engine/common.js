@@ -3,6 +3,7 @@ import Engine from '../engine'
 import * as is from '../is'
 import same from '../same'
 import { arrize } from '../utils'
+import * as ensure from '../ensure'
 
 const common = new Engine()
 export default common
@@ -24,10 +25,10 @@ common.append('conditions', '$nin', function (a, b) { let aa = arrize(a); return
 
 // Logical
 
-common.append('conditions', '$or', function (a, b) { return b.reduce(((p, c) => p || this.test(a, c)), false) })
-common.append('conditions', '$and', function (a, b) { return b.reduce(((p, c) => p && this.test(a, c)), true) })
+common.append('conditions', '$or', function (a, b) { ensure.array(b); return b.reduce(((p, c) => p || this.test(a, c)), false) })
+common.append('conditions', '$and', function (a, b) { ensure.array(b); return b.reduce(((p, c) => p && this.test(a, c)), true) })
 common.append('conditions', '$not', function (a, b) { return !this.test(a, b) })
-common.append('conditions', '$nor', function (a, b) { return b.reduce(((p, c) => p && !this.test(a, c)), true) })
+common.append('conditions', '$nor', function (a, b) { ensure.array(b); return b.reduce(((p, c) => p && !this.test(a, c)), true) })
 
 // Element
 
