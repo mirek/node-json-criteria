@@ -4,7 +4,8 @@
   "description": "Evaluate criteria queries on JSON objects MongoDB style.",
   "main": "lib/index.js",
   "scripts": {
-    "test": "grunt test"
+    "test": "grunt test",
+    "prepublish": "grunt recompile"
   },
   "repository": {
     "type": "git",

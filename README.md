@@ -1,19 +1,27 @@
 
 ## Summary [![Build Status](https://travis-ci.org/mirek/node-json-criteria.png?branch=master)](https://travis-ci.org/mirek/node-json-criteria)
 
-Criteria queries on JSON objects MongoDB style.
+Criteria queries on JSON objects Mongo style.
 
 ## Installation
 
-    npm install 6to5 --save
     npm install json-criteria --save
+
+On ES5 runtime, install also:
+
+    npm install 6to5 --save
 
 ## Usage
 
 Example:
 
-    // At the entrypoint of your app, see http://6to5.org/docs/usage/polyfill/ for details.
-    require('6to5/polyfill')
+    // In ES5 runtime at the entrypoint of your app, see http://6to5.org/docs/usage/polyfill/ for details.
+    //
+    //   require('6to5/polyfill')
+    //
+    // Use library with `/6to5` suffix:
+    //
+    //   var jc = require('json-criteria/6to5')
 
     var jc = require('json-criteria')
     console.log(jc.test({ foo: { bar: 123 } }, { 'foo.bar': { $eq: 123 } })) // true
@@ -58,6 +66,7 @@ Let's say you've got JSON based RESTful API that you want to test using mocha:
 
     var assert = require('assert')
     var request = require('request')
+    var jc = require('json-criteria')
     var endpoint = 'http://localhost:3000/api/v1'
 
     function get (path, criteria) {
