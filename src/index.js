@@ -1,13 +1,13 @@
 
-import extended_ from './engine/extended'
+import ext_ from './engine/ext'
 import mongo_ from './engine/mongo'
 
-export default extended_
+export default mongo_
 
 export function test (a, q) {
-  return extended_.test(a, q)
+  return mongo_.test(a, q)
 }
 
-export const extended = extended_
+export const ext = ext_
 
 export const mongo = mongo_

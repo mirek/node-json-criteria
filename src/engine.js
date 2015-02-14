@@ -17,10 +17,6 @@ export default class Engine {
     })
   }
 
-  // freeze () {
-  //   throw new Error('TODO')
-  // }
-
   append (t, k, f) {
     this.registry[t].push([ k, f ])
   }
@@ -55,18 +51,15 @@ export default class Engine {
   test (d, q = {}) {
     let r = true
 
-    // console.log('->', JSON.stringify({ d, q, leaf: is.leaf(q) }, null, '  '))
-
     if (is.leaf(q)) {
-      r = r && this.test(d, { $eq: q })
+
+      // Implicit equality.
+      r = r && same(d, q)
     } else {
       for (let [ qk, qv ] of kvs(q)) {
         if (qk[0] === '$') {
 
           let [ t, f ] = this.rule(qk)
-
-          // console.log('t>', t, f)
-
           switch (t) {
             case 'expansions': r = r && this.test(d, f); break
             case 'virtuals': r = r && this.test(f.bind(this)(d, qv), qv); break
@@ -78,19 +71,23 @@ export default class Engine {
             break
           }
         } else {
-          let tqk = decoded(qk) // Allow _$foo to reference $foo attributes.
-          // console.log('d>', tqk)
+
+          // Allow _$foo to reference $foo attributes.
+          let tqk = decoded(qk)
           let [ dvp, dk ] = resolve(d, tqk) || []
-          if (dvp !== null && dk.length === 1) { // ...it's resolved
+          if (dvp !== null && dk.length === 1) {
+
+            // ...it's resolved
             r = r && this.test(dvp[dk[0]], qv)
           } else {
-            r = r && this.test(undefined, qv) // we can still match `{ $exists: false }`, possibly in nested `{ $or: [] }`.
+
+            // We can still match `{ $exists: false }`, possibly in nested
+            // `{ $or: [] }`.
+            r = r && this.test(undefined, qv)
           }
         }
       }
     }
-
-    // console.log('<-', JSON.stringify({ r, d, q }, null, '  '))
 
     return r
   }

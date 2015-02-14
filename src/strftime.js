@@ -121,7 +121,3 @@ export function test (a, b) {
   let [ err, r, i, j ] = test_(a, b)
   return r
 }
-
-// let f = '%Y-%m-%d'
-// let d = '2004-10-11'
-// console.log(test(f, d))

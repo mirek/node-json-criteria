@@ -1,8 +1,8 @@
 
 import * as is from './is'
 
-// Decode query key from '_$foo' -> '$foo'. Encoding allows to refer to document attributes which would conflict with
-// ops.
+// Decode query key from '_$foo' -> '$foo'. Encoding allows to refer to document
+// attributes which would conflict with ops.
 export function decoded (qk) {
   let r = qk
   if (qk[0] === '_' && qk[1] === '$') {
@@ -11,8 +11,8 @@ export function decoded (qk) {
   return r
 }
 
-// Arrize path by splitting 'foo.bar' -> [ 'foo', 'bar' ], unless string starts with ' ' then
-// ' foo.bar' -> [ 'foo.bar' ]
+// Arrize path by splitting 'foo.bar' -> [ 'foo', 'bar' ], unless string starts
+// with ' ' then ' foo.bar' -> [ 'foo.bar' ].
 export function split (a) {
   let r = undefined
   if (a[0] === ' ') {
@@ -23,17 +23,7 @@ export function split (a) {
   return r
 }
 
-// # Resolve key path on an object.
-// #
-// # @example Example
-// #   a = hello: in: nested: world: '!'
-// #   console.log resolve a, 'hello.in.nested'
-// #   # [ { nested: { world: '!' } }, [ 'nested' ] ]
-// #
-// # @param [Object] a An object to perform resolve on.
-// # @param [String] path Key path.
-// # @return [Array] [obj, path] tuple where obj is a resolved object and path an
-// #   array with last component or multiple unresolved components.
+// Resolve key path on an object.
 export function resolve (a, path) {
   let stack = split(path)
   let last = []
