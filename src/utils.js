@@ -1,6 +1,16 @@
 
 import * as is from './is'
 
+// Decode query key from '_$foo' -> '$foo'. Encoding allows to refer to document attributes which would conflict with
+// ops.
+export function decoded (qk) {
+  let r = qk
+  if (qk[0] === '_' && qk[1] === '$') {
+    r = qk.substr(1)
+  }
+  return r
+}
+
 // Arrize path by splitting 'foo.bar' -> [ 'foo', 'bar' ], unless string starts with ' ' then
 // ' foo.bar' -> [ 'foo.bar' ]
 export function split (a) {

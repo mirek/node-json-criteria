@@ -1,17 +1,7 @@
 
 import * as is from './is'
 import same from './same'
-import { kvs, resolve } from './utils'
-
-// Decode query key from '_$foo' -> '$foo'. Encoding allows to refer to document attributes which would conflict with
-// ops.
-function decoded (qk) {
-  let r = qk
-  if (qk[0] === '_' && qk[1] === '$') {
-    r = qk.substr(1)
-  }
-  return r
-}
+import { kvs, resolve, decoded } from './utils'
 
 export default class Engine {
 

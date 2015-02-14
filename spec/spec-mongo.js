@@ -1,9 +1,9 @@
 
 import assert from 'assert'
-import { test } from '../src'
+import { mongo } from '../src'
 
-let y = (a, q) => assert.equal(true, test(a, q))
-let n = (a, q) => assert.equal(false, test(a, q))
+let y = (a, q) => assert.equal(true, mongo.test(a, q))
+let n = (a, q) => assert.equal(false, mongo.test(a, q))
 
 describe('test', () => {
 
@@ -20,13 +20,13 @@ describe('test', () => {
 
   describe('type errors', () => {
     it('should throw for $and: {}', () => {
-      assert.throws(() => test({}, { $and: {} }), TypeError)
+      assert.throws(() => mongo.test({}, { $and: {} }), TypeError)
     })
     it('should throw for $or: {}', () => {
-      assert.throws(() => test({}, { $or: {} }), TypeError)
+      assert.throws(() => mongo.test({}, { $or: {} }), TypeError)
     })
     it('should throw for $nor: {}', () => {
-      assert.throws(() => test({}, { $nor: {} }), TypeError)
+      assert.throws(() => mongo.test({}, { $nor: {} }), TypeError)
     })
   })
 
@@ -367,59 +367,124 @@ describe('test', () => {
     it('should not match', () => {
       n({ foo: { bar: [ 1, 3, 5 ] } }, { 'foo.bar': { $size: 1 } })
     })
-    
+
   })
 
-  // describe '$type', ->
-  //
-  //   it 'should match number type', ->
-  //     y { foo: bar: 1.2 }, { 'foo.bar': $type: 'number' }
-  //
-  //   it 'should match boolean type', ->
-  //     y { foo: bar: true }, { 'foo.bar': $type: 'boolean' }
-  //
-  //   it 'should match string type', ->
-  //     y { foo: bar: 'foo' }, { 'foo.bar': $type: 'string' }
-  //
-  //   it 'should match object type', ->
-  //     y { foo: bar: /foo/ }, { 'foo.bar': $type: 'object' }
-  //     y { foo: bar: new Date() }, { 'foo.bar': $type: 'object' }
+  describe('other and corner cases', () => {
 
-  it('should test $length', () => {
-    n({ foo: null }, { foo: { $length: { $gt: 1, $lt: 5 } } })
-    n({ foo: '' }, { foo: { $length: { $gt: 1, $lt: 5 } } })
-    n({ foo: 'h' }, { foo: { $length: { $gt: 1, $lt: 5 } } })
-    y({ foo: 'he' }, { foo: { $length: { $gt: 1, $lt: 5 } } })
-    y({ foo: 'hel' }, { foo: { $length: { $gt: 1, $lt: 5 } } })
-    y({ foo: 'hell' }, { foo: { $length: { $gt: 1, $lt: 5 } } })
-    n({ foo: 'hello' }, { foo: { $length: { $gt: 1, $lt: 5 } } })
+    it('should match in namespace #1', () => {
+      let q = {
+        foo: {
+          beg: { $gt: 1 },
+          end: { $lt: 10 }
+        },
+        bar: {
+          beg: { $gt: 11 },
+          end: { $lt: 20 }
+        }
+      }
+      y({ foo: { beg: 2, end: 9 }, bar: { beg: 12, end: 19 } }, q)
+      n({ foo: { beg: 1, end: 9 }, bar: { beg: 12, end: 19 } }, q)
+      n({ foo: { beg: 2, end: 10 }, bar: { beg: 12, end: 19 } }, q)
+      n({ foo: { beg: 2, end: 9 }, bar: { beg: 11, end: 19 } }, q)
+      n({ foo: { beg: 2, end: 9 }, bar: { beg: 12, end: 20 } }, q)
+    })
+
+    it('should match in namespace #2', () => {
+      let q = {
+        foo: {
+          $or: [
+            { $eq: 'max' },
+            { $gte: 10 }
+          ]
+        }
+      }
+      y({ foo: 'max' }, q)
+      y({ foo: 10 }, q)
+      y({ foo: 11 }, q)
+      n({ foo: 9 }, q)
+      n({ foo: 'min' }, q)
+    })
+
+    it('should match range', () => {
+      y({ foo: { bar: 1 } }, { 'foo.bar': { $gt: 0, $lte: 1 } })
+    })
+
+    it('should not match range', () => {
+      n({ foo: { bar: 2 } }, { 'foo.bar': { $gt: 0, $lte: 1 } })
+    })
+
+    it('should match if nothing is provided', () => {
+      y(null, null)
+      n({}, null)
+      n(null, {})
+      y({}, {})
+    })
+
+    it('should throw if op is not found', () => {
+      assert.throws( () => mongo.test({ foo: 1 }, { $foo: 1 }) )
+    })
+
+    it('should work with example #1', () => {
+      y({ meta: { duration: { milliseconds: 1, seconds: 0.001, readable: { seconds: '0.00 sec' } }, bg: false }, group: { name: 'hello-a' } }, { 'group.name': { $eq: 'hello-a' }, 'meta.bg': { '$eq': false } })
+    })
+
+    it('should work with example #2', () => {
+      n({"meta":{"duration":{"milliseconds":1,"seconds":0.001,"readable":{"seconds":"0.00 sec"}},"bg":false}}, {"group.name":{"$eq":"hello-a"},"meta.bg":{"$eq":0}})
+    })
+
+    it('should work with example #3', () => {
+      let a = {
+        "meta": {
+          "duration": {
+            "milliseconds": 39,
+            "seconds": 0.039,
+            "readable": {
+              "seconds": "0.04 sec"
+            }
+          },
+          "timestamp": 1111111111.11,
+          "refresh": "affected",
+          "affected": {
+            "paths": [
+              "kafka.feed_click.domain.111111111111111111111111.name",
+              "kafka.feed_click.domain.111111111111111111111111.last_access",
+              "kafka.feed_click.domain.111111111111111111111111.count"
+            ]
+          }
+        },
+        "update": {
+          "ok": 1,
+          "nModified": 1,
+          "n": 1
+        }
+      }
+      y(a, { update: { $eq: { "ok": 1, "nModified": 1, "n": 1 } } } )
+      n(a, { update: { $eq: { "ok": 1, "nModified": 2, "n": 1 } } } )
+      n(a, { update: { $eq: { "ok": 1, "nModified": 1, "x": 1 } } } )
+    })
+
   })
 
-  it('should test $email', () => {
-    y({ foo: 'mirek@test.com' }, { foo: { $email: true } })
-    n({ foo: 'mirek@@test.com' }, { foo: { $email: true } })
-    n({ foo: 'mirekrusin.com' }, { foo: { $email: true } })
-  })
+  describe('$type', () => {
 
-  it('should match $object-id', () => {
-    y({ foo: { $oid: '54d72bbf562d4b42fc4802cd' } }, { foo: { '$object-id': true } })
-    n({ foo: { $oid: '54d72bbf562d4b42fc4802c' } }, { foo: { '$object-id': true } })
-    n({ foo: { $oid: '54d72bbf562d4b42fc4802cda' } }, { foo: { '$object-id': true } })
-    n({ foo: '54d72bbf562d4b42fc4802cd' }, { foo: { '$object-id': true } })
-    y({ foo: '54d72bbf562d4b42fc4802cd' }, { foo: { '$string-object-id': true } })
-  })
+    it('should match number type', () => {
+      y({ foo: { bar: 1.2 } }, { 'foo.bar': { $type: 'number' } })
+    })
 
-  it('should match $strftime', () => {
-    y({ foo: '2015-02-08' }, { foo: { $strftime: '%Y-%m-%d' } })
-    n({ foo: '2015-02-08a' }, { foo: { $strftime: '%Y-%m-%d' } })
-    n({ foo: '2015-02-8' }, { foo: { $strftime: '%Y-%m-%d' } })
-    n({ foo: '2015-2-8' }, { foo: { $strftime: '%Y-%m-%d' } })
-    n({ foo: 'bar' }, { foo: { $strftime: '%Y-%m-%d' } })
-  })
+    it('should match boolean type', () => {
+      y({ foo: { bar: true } }, { 'foo.bar': { $type: 'boolean' } })
+    })
 
-  it('should match $date-iso', () => {
-    y({ foo: '2015-02-08T00:00:00Z' }, { foo: { '$date-iso': true } })
-    n({ foo: '2015-02-08 00:00:00Z' }, { foo: { '$date-iso': true } })
+    it('should match string type', () => {
+      y({ foo: { bar: 'foo' } }, { 'foo.bar': { $type: 'string' } })
+    })
+
+    it('should match object type', () => {
+      y({ foo: { bar: /foo/ } }, { 'foo.bar': { $type: 'object' } })
+      y({ foo: { bar: new Date() } }, { 'foo.bar': { $type: 'object' } })
+    })
+
   })
 
 })
