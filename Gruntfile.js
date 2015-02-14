@@ -4,6 +4,32 @@ module.exports = function(grunt) {
   require("load-grunt-tasks")(grunt)
 
   grunt.initConfig({
+    pkg: grunt.file.readJSON('package.json'),
+    copy: {
+      version: {
+        files: {
+          'dist/json-criteria-<%= pkg.version %>.js': 'dist/json-criteria.js',
+          'dist/json-criteria-<%= pkg.version %>.min.js': 'dist/json-criteria.min.js'
+        }
+      }
+    },
+    browserify: {
+      dist: {
+        files: {
+          'dist/json-criteria.js': [ 'src/**/*.js' ]
+        },
+        options: {
+          transform: ['6to5ify']
+        }
+      }
+    },
+    uglify: {
+      dist: {
+        files: {
+          'dist/json-criteria.min.js': [ 'dist/json-criteria.js' ]
+        }
+      }
+    },
     "6to5": {
       options: {
         sourceMap: false
@@ -20,7 +46,8 @@ module.exports = function(grunt) {
       }
     },
     clean: {
-      lib: 'lib'
+      lib: 'lib',
+      dist: 'dist'
     },
     watch: {
       coffee: {
@@ -39,8 +66,8 @@ module.exports = function(grunt) {
     }
   })
 
-  grunt.registerTask('test', ['mochaTest'])
-  grunt.registerTask('compile', ['6to5:lib'])
-  grunt.registerTask('recompile', ['clean:lib', 'compile'])
-  grunt.registerTask('default', ['recompile'])
+  grunt.registerTask('test', [ 'mochaTest' ])
+  grunt.registerTask('compile', [ '6to5', 'browserify', 'uglify', 'copy:version' ])
+  grunt.registerTask('recompile', [ 'clean', 'compile' ])
+  grunt.registerTask('default', [ 'recompile', 'test' ])
 }

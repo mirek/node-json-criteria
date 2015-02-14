@@ -1,22 +1,21 @@
 
 ## Summary [![Build Status](https://travis-ci.org/mirek/node-json-criteria.png?branch=master)](https://travis-ci.org/mirek/node-json-criteria)
 
-Invoke criteria queries in MongoDB format on JSON objects.
+Criteria queries on JSON objects MongoDB style.
 
 MongoDB implements flexible query format expressed in condensed JSON format. This package brings this functionality to nodejs.
 
 ## Installation
 
+    npm install 6to5 --save
     npm install json-criteria --save
 
 ## Usage
 
-Exported functions:
-
-* `test(doc, crit)` - returns true/false
-* `assert(doc, crit)` - throws if not matched
-
 Example:
+
+    // At the entrypoint of your app, see http://6to5.org/docs/usage/polyfill/ for details.
+    require('6to5/polyfill')
 
     var jc = require('json-criteria')
     console.log(jc.test({ foo: bar: 123 }, { 'foo.bar': { $eq: 123 } })) // true
