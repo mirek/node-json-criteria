@@ -18,8 +18,8 @@ Example:
     require('6to5/polyfill')
 
     var jc = require('json-criteria')
-    console.log(jc.test({ foo: bar: 123 }, { 'foo.bar': { $eq: 123 } })) // true
-    console.log(jc.test({ foo: bar: 123 }, { 'foo.bar': { $lt: 100 } })) // false
+    console.log(jc.test({ foo: { bar: 123 } }, { 'foo.bar': { $eq: 123 } })) // true
+    console.log(jc.test({ foo: { bar: 123 } }, { 'foo.bar': { $lt: 100 } })) // false
 
 Criteria queries follow MongoDB convention. You can use operators described at http://docs.mongodb.org/manual/reference/operator/query
 
@@ -29,7 +29,8 @@ Criteria queries follow MongoDB convention. You can use operators described at h
   * `{ $nor: [ ... ] }` - none of
   * `{ $not: ... }` - not, ie. `{ $not: { $gt: 0, $lt: 1 } }`
 * comparison ops
-  * `{ field: { $eq: ... } }` - is equal
+  * `{ field: ... }` - is equal (implicit)
+  * `{ field: { $eq: ... } }` - is equal (explicit)
   * `{ field: { $ne: ... } }` - is not equal
   * `{ field: { $gt: ... } }` - is greater than
   * `{ field: { $gte: ... } }` - is greater than or equal
@@ -43,28 +44,22 @@ Criteria queries follow MongoDB convention. You can use operators described at h
 * evaluation ops
   * `{ field: { $mod: [ div, rem ] } }` - divided by div has reminder rem
   * `{ field: { $regexp: '...', $options: 'i' } }` - matches regular expression with optional options
-  * `$text` - fts is not supported
   * `{ field: { $where: function (v) { return true/false } } }` - performs test using provided function, for security purposes function body as string is not supported
-* geospatial ops - not supported atm
 * array ops
   * `{ field: { $all: [ ... ] } }` - all of the values are in the field's value
   * `{ field: { $elemMatch: ... } }` - at least one element matches
   * `{ field: { $size: ... } }` - matches length of field's array value
 
-Not supported:
-
-* `{ filed: value }` - implicit equality is not supported, use: `{ field: { $eq: ... } }` explicit equality operator instead.
-
 Example criteria queries:
 
-| document            | criteria                            | result |
-|---------------------|-------------------------------------|--------|
-| { foo: bar: 'abc' } | { 'foo.bar': $exists: true }        | true   |
-| { foo: bar: 'abc' } | { 'foo.baz': $exists: true }        | false  |
-| { foo: bar: 'abc' } | { 'foo.bar': { $eq: 'abc' } }       | true   |
-| { foo: bar: 1 }     | { 'foo.bar': { $gt: 0 } }           | true   |
-| { foo: bar: 1 }     | { 'foo.bar': { $gt: 0, $lt: 1 } }   | false  |
-| { foo: bar: 1 }     | { 'foo.bar': { $gt: 0, $lte: 1 } }  | true   |
+| document                | criteria                                | result |
+|-------------------------|-----------------------------------------|--------|
+| { foo: { bar: 'abc' } } | { 'foo.bar': { $exists: true } }        | true   |
+| { foo: { bar: 'abc' } } | { 'foo.baz': { $exists: true } }        | false  |
+| { foo: { bar: 'abc' } } | { 'foo.bar': { $eq: 'abc' } }           | true   |
+| { foo: { bar: 1 } }     | { 'foo.bar': { $gt: 0 } }               | true   |
+| { foo: { bar: 1 } }     | { 'foo.bar': { $gt: 0, $lt: 1 } }       | false  |
+| { foo: { bar: 1 } }     | { 'foo.bar': { $gt: 0, $lte: 1 } }      | true   |
 
 For more examples have a look at specs.
 
@@ -72,96 +67,47 @@ For more examples have a look at specs.
 
 One example of good use case for this functionality is writing tests for API calls.
 
-Let's say you've got JSON based RESTful API that you want to test using, let's say, mocha:
+Let's say you've got JSON based RESTful API that you want to test using mocha:
 
-    # spec/spec-my-api.coffee
+    // spec/spec-my-api.js
 
-    assert = require 'assert'
-    request = require 'request'
-    endpoint = '...'
+    var assert = require('assert')
+    var request = require('request')
+    var endpoint = 'http://localhost:3000/api/v1'
 
-    describe 'my api', ->
-      it 'should have zero users', (done) ->
+    function get (path, criteria) {
+      return function (done) {
         request
-          .get "#{endpoint}/users/count"
-          .end (err, resp) ->
-            assert.ifError err
-            assert.equal 0, resp.body?.count
-            done err
+          .get(endpoint + path)
+          .end(function (err, resp) {
+            assert.ifError(err)
+            assert.ok(resp.body.count > 0)
+            assert.ok(jc.test(resp.body, criteria))
+            done(err)
+          })
+      }
+    }
 
-You can use criteria query like this:
+    describe('api', function () {
 
-    # spec/spec-my-api.coffee
+      it('should have zero users', get('users/count', { count: 0 }))
 
-    assert = require 'assert'
-    request = require 'request'
-    jc = require 'json-criteria'
-    endpoint = '...'
+      it('should have empty user list', get('users', { users: { $size: 0 } }))
 
-    describe 'my api', ->
-      it 'should have zero users', (done) ->
-        request
-          .get "#{endpoint}/users/count"
-          .end (err, resp) ->
-            assert.ifError err
-            assert.ok js.test resp.body, { count: $eq: 0 }
-            done err
+      it('should have 3 to 5 products', get('products', { 'meta.count': { $gt: 2, $lte: 5 } }))
 
-Not that much of a change, but because we're using more expressive criteria query language now, we can
-refactor this test to it's own function with criteria parameter:
-
-    # spec/spec-my-api.coffee
-
-    assert = require 'assert'
-    request = require 'request'
-    jc = require 'json-criteria'
-    endpoint = '...'
-
-    get = (path, criteria, done) ->
-      request
-        .get "#{endpoint}/#{path}"
-        .end (err, resp) ->
-          assert.ifError err
-          assert.ok jc.test resp.body, criteria
-          done err
-
-    describe 'my api', ->
-      it 'should have zero users', (done) ->
-        get 'users/count', { count: $eq: 0 }, done
-
-We could stop here but if checking successul response structure is enough for our API test coverage we can refactor
-our function so it returns a function object:
-
-    # spec/spec-my-api.coffee
-
-    assert = require 'assert'
-    request = require 'request'
-    jc = require 'json-criteria'
-    endpoint = '...'
-
-    get = (path, criteria) ->
-      (done) ->
-        request
-          .get "#{endpoint}/#{path}"
-          .end (err, resp) ->
-            assert.ifError err
-            assert.ok jc.test resp.body, criteria
-            done err
-
-    describe 'my api', ->
-      it 'should have zero users', get 'users/count', { count: $eq: 0 }
-
-Other tests can be often expressed in a single or just few lines now:
-
-      it 'should have empty user list', get 'users', { users: $size: 0 }
-
-      it 'should have 3 to 5 products', get 'products', { 'meta.count': { $gt: 2, $lte: 5 } }
-
-      it 'should have 3 products with meta check', get 'products',
+      it('should have 3 products with meta count check', get('products', {
         $and: [
-          { 'meta.count': { $eq: 3 } }
-          { products: $size: 3 }
+          { 'meta.count': 3 },
+          { products: { $size: 3 } }
         ]
+      }))
+
+      it('should have shipped flag', get('orders/1', {
+        tags: { $in: [ 'shipped' ] }
+      }))
+
+    })
 
 ## License
 
