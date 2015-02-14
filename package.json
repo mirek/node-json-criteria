@@ -7,13 +7,7 @@
     "test": "grunt test",
     "prepublish": "grunt recompile"
   },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/mirek/node-json-criteria.git"
-  },
-  "bugs": {
-    "url": "https://github.com/mirek/node-json-criteria/issues"
-  },
+  "repository": "mirek/node-json-criteria",
   "homepage": "https://github.com/mirek/node-json-criteria",
   "keywords": [
     "mongo",

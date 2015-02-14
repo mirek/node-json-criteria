@@ -51,14 +51,15 @@ module.exports = function(grunt) {
             expand: true,
             cwd: 'src',
             src: [ '**/*.js' ],
-            dest: 'lib/6to5'
+            dest: '6to5'
           }
         ]
       }
     },
     clean: {
       lib: 'lib',
-      dist: 'dist'
+      dist: 'dist',
+      '6to5': '6to5'
     },
     mochaTest: {
       test: {
