@@ -3,8 +3,6 @@
 
 Criteria queries on JSON objects MongoDB style.
 
-MongoDB implements flexible query format expressed in condensed JSON format. This package brings this functionality to nodejs.
-
 ## Installation
 
     npm install 6to5 --save
@@ -50,22 +48,9 @@ Criteria queries follow MongoDB convention. You can use operators described at h
   * `{ field: { $elemMatch: ... } }` - at least one element matches
   * `{ field: { $size: ... } }` - matches length of field's array value
 
-Example criteria queries:
-
-| document                | criteria                                | result |
-|-------------------------|-----------------------------------------|--------|
-| { foo: { bar: 'abc' } } | { 'foo.bar': { $exists: true } }        | true   |
-| { foo: { bar: 'abc' } } | { 'foo.baz': { $exists: true } }        | false  |
-| { foo: { bar: 'abc' } } | { 'foo.bar': { $eq: 'abc' } }           | true   |
-| { foo: { bar: 1 } }     | { 'foo.bar': { $gt: 0 } }               | true   |
-| { foo: { bar: 1 } }     | { 'foo.bar': { $gt: 0, $lt: 1 } }       | false  |
-| { foo: { bar: 1 } }     | { 'foo.bar': { $gt: 0, $lte: 1 } }      | true   |
-
 For more examples have a look at specs.
 
-# Example Use Case - Mocha API Specs
-
-One example of good use case for this functionality is writing tests for API calls.
+# Example Use Case
 
 Let's say you've got JSON based RESTful API that you want to test using mocha:
 
