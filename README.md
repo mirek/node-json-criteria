@@ -5,23 +5,15 @@ Criteria queries on JSON objects Mongo style.
 
 ## Installation
 
-    npm install json-criteria --save
-
-On ES5 runtime, install also:
-
     npm install 6to5 --save
+    npm install json-criteria --save
 
 ## Usage
 
 Example:
 
     // In ES5 runtime at the entrypoint of your app, see http://6to5.org/docs/usage/polyfill/ for details.
-    //
-    //   require('6to5/polyfill')
-    //
-    // Use library with `/6to5` suffix:
-    //
-    //   var jc = require('json-criteria/6to5')
+    // require('6to5/polyfill')
 
     var jc = require('json-criteria')
     console.log(jc.test({ foo: { bar: 123 } }, { 'foo.bar': { $eq: 123 } })) // true
