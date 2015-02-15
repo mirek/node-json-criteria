@@ -12,16 +12,6 @@ module.exports = function(grunt) {
           'dist/json-criteria-<%= pkg.version %>.min.js':
             'dist/json-criteria.min.js'
         }
-      },
-      es6: {
-        files: [
-          {
-            expand: true,
-            cwd: 'src',
-            src: [ '**/*.js' ],
-            dest: 'lib'
-          }
-        ]
       }
     },
     browserify: {
@@ -43,7 +33,7 @@ module.exports = function(grunt) {
     },
     "6to5": {
       options: {
-        sourceMap: false
+        sourceMap: true
       },
       lib: {
         files: [
@@ -51,15 +41,14 @@ module.exports = function(grunt) {
             expand: true,
             cwd: 'src',
             src: [ '**/*.js' ],
-            dest: '6to5'
+            dest: 'lib'
           }
         ]
       }
     },
     clean: {
       lib: 'lib',
-      dist: 'dist',
-      '6to5': '6to5'
+      dist: 'dist'
     },
     mochaTest: {
       test: {
@@ -75,7 +64,7 @@ module.exports = function(grunt) {
   grunt.registerTask('test', [ 'mochaTest' ])
 
   grunt.registerTask('compile', [
-    'copy:es6', '6to5', 'browserify', 'uglify', 'copy:version'
+    '6to5', 'browserify', 'uglify', 'copy:version'
   ])
 
   grunt.registerTask('recompile', [ 'clean', 'compile' ])
