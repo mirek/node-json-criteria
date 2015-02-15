@@ -19,6 +19,20 @@ Example:
     console.log(jc.test({ foo: { bar: 123 } }, { 'foo.bar': { $eq: 123 } })) // true
     console.log(jc.test({ foo: { bar: 123 } }, { 'foo.bar': { $lt: 100 } })) // false
 
+## ES6
+
+If you're running ES6 (ie. via `6to5-node ...`) you can use:
+
+    let { test } import from 'json-criteria'
+    console.log(test( { foo: 1 }, { foo: { $lt: 2 } } ))
+
+Or:
+
+    let jc import from 'json-criteria'
+    console.log(jc.test( { foo: 1 }, { foo: { $lt: 2 } } ))
+
+## Ops
+
 Criteria queries follow MongoDB convention. You can use operators described at http://docs.mongodb.org/manual/reference/operator/query
 
 * logical ops
