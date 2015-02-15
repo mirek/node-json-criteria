@@ -5,31 +5,32 @@ Criteria queries on JSON objects Mongo style.
 
 ## Installation
 
-    npm install 6to5 --save
     npm install json-criteria --save
 
 ## Usage
 
-Example:
+### Node
 
-    // In ES5 runtime at the entrypoint of your app, see http://6to5.org/docs/usage/polyfill/ for details.
-    // require('6to5/polyfill')
+    // npm install babel --save
+    // Once at the entrypoint of your app.
+    require('babel/register')
 
-    var jc = require('json-criteria')
-    console.log(jc.test({ foo: { bar: 123 } }, { 'foo.bar': { $eq: 123 } })) // true
-    console.log(jc.test({ foo: { bar: 123 } }, { 'foo.bar': { $lt: 100 } })) // false
+    var test = require('json-criteria').test
+    console.log(test( {foo:1}, {foo:{$gt:0}} ))
 
-## ES6
+### CoffeeScript
 
-If you're running ES6 (ie. via `6to5-node ...`) you can use:
+    # npm install babel --save
+    # Once at the entrypoint of your app.
+    require("babel/register")
 
-    let { test } import from 'json-criteria'
-    console.log(test( { foo: 1 }, { foo: { $lt: 2 } } ))
+    { test } = require 'json-criteria'
+    console.log test {foo:1}, {foo:{$gt:0}}
 
-Or:
+### Babel
 
-    let jc import from 'json-criteria'
-    console.log(jc.test( { foo: 1 }, { foo: { $lt: 2 } } ))
+    import { test } from 'json-criteria'
+    console.log(test( {foo:1}, {foo:{$gt:0}} ))
 
 ## Ops
 

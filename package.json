@@ -20,14 +20,15 @@
   ],
   "author": "Mirek Rusin http://github.com/mirek",
   "license": "MIT",
-  "dependencies": {
-    "rus-diff": "0.0.8"
-  },
+  "dependencies": {},
   "devDependencies": {
     "6to5": "^3.6.4",
     "6to5ify": "^4.1.1",
+    "babel": "^4.0.1",
+    "babelify": "^5.0.3",
     "grunt": "^0.4.5",
     "grunt-6to5": "^3.0.1",
+    "grunt-babel": "^4.0.0",
     "grunt-browserify": "^3.3.0",
     "grunt-cli": "^0.1.13",
     "grunt-contrib-clean": "^0.6.0",

@@ -20,7 +20,7 @@ module.exports = function(grunt) {
           'dist/json-criteria.js': [ 'src/**/*.js' ]
         },
         options: {
-          transform: [ '6to5ify' ]
+          transform: [ 'babelify' ]
         }
       }
     },
@@ -31,7 +31,7 @@ module.exports = function(grunt) {
         }
       }
     },
-    "6to5": {
+    babel: {
       options: {
         sourceMap: true
       },
@@ -54,7 +54,7 @@ module.exports = function(grunt) {
       test: {
         options: {
           reporter: 'spec',
-          require: [ '6to5/register' ]
+          require: [ 'babel/register' ]
         },
         src: [ 'spec/**/*.js' ]
       }
@@ -64,7 +64,7 @@ module.exports = function(grunt) {
   grunt.registerTask('test', [ 'mochaTest' ])
 
   grunt.registerTask('compile', [
-    '6to5', 'browserify', 'uglify', 'copy:version'
+    'babel', 'browserify', 'uglify', 'copy:version'
   ])
 
   grunt.registerTask('recompile', [ 'clean', 'compile' ])
