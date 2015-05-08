@@ -487,4 +487,13 @@ describe('test', () => {
 
   })
 
+  describe('other', () => {
+
+    it('should work with $type and $size = 0 for empty array', () => {
+      y({ values: [] }, { values: { $size: 0 } })
+      y({ values: [] }, { values: { $type: 'object' } })
+    })
+
+  })
+
 })

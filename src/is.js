@@ -8,8 +8,25 @@ export function array (a) {
   return Array.isArray(a)
 }
 
+export function plain (a) {
+  return object(a) && a.constructor === Object
+}
+
 export function object (a) {
   return typeof a === 'object' && a !== null
+}
+
+export function string (a) {
+  return typeof a === 'string'
+}
+
+export function number (a) {
+  return typeof a === 'number'
+}
+
+// Return true if value is an array with string elements only.
+export function strings (a) {
+  return array(a) && a.every((e) => string(e))
 }
 
 export function date (a) {

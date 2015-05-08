@@ -8,65 +8,38 @@ export function test (json, query) {
   return ext.test(json, query)
 }
 
-ext.append('expansions', '$ext:int', {
-  $type: 'number',
-  $mod: [ 1, 0 ]
-})
+// Expansions
 
-ext.append('expansions', '$ext:natural', {
-  $type: 'number',
-  $mod: [ 1, 0 ],
-  $gte: 0
-})
+ext.append2(require('../rules/array'))
+ext.append2(require('../rules/email'))
+ext.append2(require('../rules/ext-oid'))
+ext.append2(require('../rules/hex'))
+ext.append2(require('../rules/number-integer'))
+ext.append2(require('../rules/number-natural'))
+ext.append2(require('../rules/number'))
+ext.append2(require('../rules/string-oid'))
+ext.append2(require('../rules/string'))
 
-ext.append('expansions', '$ext:email', {
-  $type: 'string',
-  $regex: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i
-})
+// Conditions
 
-ext.append('expansions', '$ext:hex', {
-  $type: 'string',
-  $regex: /^[0-9A-F]+$/i
-})
+ext.append2(require('../rules/every'))
+ext.append2(require('../rules/is'))
+ext.append2(require('../rules/none'))
+ext.append2(require('../rules/some'))
+ext.append2(require('../rules/strftime-iso'))
+ext.append2(require('../rules/strftime'))
 
-ext.append('expansions', '$ext:objectid:string', {
-  $type: 'string',
-  $regex: /^[0-9A-F]{24}$/i
-})
+// Virtuals
 
-ext.append('expansions', '$ext:objectid', {
-  ' $oid': {
-    '$ext:objectid:string': true
-  }
-})
+ext.append2(require('../rules/length'))
+ext.append2(require('../rules/keys'))
 
-ext.append('virtuals', '$ext:length', function (a) {
-  let r = undefined
-  if (a != null && a.hasOwnProperty('length')) {
-    r = a.length
-  }
-  return r
-})
+// console.log(JSON.stringify(ext, null, '  '))
 
-import * as strftime from '../strftime'
+// console.log(ext.test({ foo: 1 }, { foo: { $is: 'number' } }))
 
-ext.append('conditions', '$ext:strftime', function (a, b) {
-  return strftime.test(b, a)
-})
+// console.log(ext.test({ foo: { $oid: '54d72bbf562d4b42fc4802c' } }, { foo: { '$string:oid': true } }))
 
-ext.append('expansions', '$ext:strftime:iso', {
-  '$ext:strftime': '%Y-%m-%dT%H:%M:%S%Z'
-})
-
-// Maybe:
-// $every
-// $any
-// $sorted
-// $unique
-// $type = array
-// $date:format
-// $date:iso
-// $keys
 // $exact / $iff
 // $creditcard
 // $guid

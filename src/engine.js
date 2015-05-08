@@ -17,6 +17,17 @@ export default class Engine {
     })
   }
 
+  append2 (d) {
+    for (let t in d) {
+      if (t === 'expansions' || t === 'virtuals' || t === 'conditions') {
+        for (let k in d[t]) {
+          let f = d[t][k]
+          this.append(t, k, f)
+        }
+      }
+    }
+  }
+
   append (t, k, f) {
     this.registry[t].push([ k, f ])
   }
@@ -72,7 +83,7 @@ export default class Engine {
           }
         } else {
 
-          // Allow _$foo to reference $foo attributes.
+          // Allow " $foo" to reference "$foo" attributes.
           let tqk = decoded(qk)
           let [ dvp, dk ] = resolve(d, tqk) || []
           if (dvp !== null && dk.length === 1) {
