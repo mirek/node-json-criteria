@@ -88,7 +88,7 @@ export default class Engine {
           let [ dvp, dk ] = resolve(d, tqk) || []
           if (dvp !== null && dk.length === 1) {
 
-            // ...it's resolved
+            // ...it's resolved.
             r = r && this.test(dvp[dk[0]], qv)
           } else {
 
