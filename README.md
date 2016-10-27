@@ -56,7 +56,7 @@ Criteria queries follow MongoDB convention. You can use operators described at h
   * `{ field: { $type: 'number|string|...' } }` - matches field type
 * evaluation ops
   * `{ field: { $mod: [ div, rem ] } }` - divided by div has reminder rem
-  * `{ field: { $regexp: '...', $options: 'i' } }` - matches regular expression with optional options
+  * `{ field: { $regex: '...', $options: 'i' } }` - matches regular expression with optional options
   * `{ field: { $where: function (v) { return true/false } } }` - performs test using provided function, for security purposes function body as string is not supported
 * array ops
   * `{ field: { $all: [ ... ] } }` - all of the values are in the field's value
