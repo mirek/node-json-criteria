@@ -8,6 +8,7 @@ let n = (a, q) => assert.equal(false, mongo.test(a, q))
 describe('test', () => {
 
   describe('implicit $eq', () => {
+    n({ bar: 1 }, { foo: { baz: 1, bar: '1' } })
     y({ foo: 1 }, { foo: 1 })
     n({ bar: 1 }, { foo: 1 })
     n({ foo: 1 }, { foo: 2 })

@@ -86,7 +86,7 @@ export default class Engine {
           // Allow " $foo" to reference "$foo" attributes.
           let tqk = decoded(qk)
           let [ dvp, dk ] = resolve(d, tqk) || []
-          if (dvp !== null && dk.length === 1) {
+          if (dvp != null && dk.length === 1) {
 
             // ...it's resolved.
             r = r && this.test(dvp[dk[0]], qv)
